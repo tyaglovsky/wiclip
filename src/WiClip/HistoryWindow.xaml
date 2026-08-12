@@ -39,16 +39,18 @@
 
             <!-- Заголовок -->
             <Grid Grid.Row="0" Margin="2,0,2,8">
-                <TextBlock Text="Буфер обмена"
+                <TextBlock Text="{x:Static local:Strings.WindowTitle}"
                            FontSize="13" FontWeight="SemiBold"
                            Foreground="{DynamicResource TextBrush}"
                            VerticalAlignment="Center"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button x:Name="SettingsButton" Style="{StaticResource FlatButton}"
-                            Content="⚙" FontSize="14" ToolTip="Настройки"
+                            Content="⚙" FontSize="14"
+                            ToolTip="{x:Static local:Strings.TooltipSettings}"
                             Click="SettingsButton_Click"/>
                     <Button x:Name="CloseButton" Style="{StaticResource FlatButton}"
-                            Content="✕" FontSize="13" ToolTip="Закрыть (Esc)"
+                            Content="✕" FontSize="13"
+                            ToolTip="{x:Static local:Strings.TooltipClose}"
                             Click="CloseButton_Click"/>
                 </StackPanel>
             </Grid>
@@ -58,7 +60,7 @@
                 <TextBox x:Name="SearchBox"
                          Style="{StaticResource SearchBox}"
                          TextChanged="SearchBox_TextChanged"/>
-                <TextBlock x:Name="SearchHint" Text="Поиск по истории…"
+                <TextBlock x:Name="SearchHint" Text="{x:Static local:Strings.SearchPlaceholder}"
                            Foreground="{DynamicResource TextDimBrush}"
                            Margin="10,0,0,0" FontSize="14"
                            VerticalAlignment="Center" IsHitTestVisible="False"/>
@@ -117,7 +119,7 @@
                 </ListBox>
 
                 <TextBlock x:Name="EmptyHint"
-                           Text="Пока пусто. Скопируйте что-нибудь — запись появится здесь."
+                           Text="{x:Static local:Strings.EmptyHistory}"
                            Foreground="{DynamicResource TextDimBrush}"
                            TextWrapping="Wrap" TextAlignment="Center"
                            VerticalAlignment="Center" Margin="20"
@@ -129,7 +131,7 @@
                 <TextBlock x:Name="HintText"
                            Foreground="{DynamicResource TextDimBrush}"
                            FontSize="11" TextWrapping="Wrap"
-                           Text="Клик — скопировать · Двойной клик или Enter — вставить · Alt+1…9 — быстрый выбор · Ctrl+P — закрепить · Shift+Delete — удалить · Esc — закрыть"/>
+                           Text="{x:Static local:Strings.Hints}"/>
                 <TextBlock x:Name="ToastText"
                            Foreground="{DynamicResource AccentBrush}"
                            FontSize="12" FontWeight="SemiBold"

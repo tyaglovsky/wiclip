@@ -8,7 +8,8 @@ A clipboard manager for Windows 10 / 11 / Server 2016+. It sits in the tray, ope
 window with your recent clips on a hotkey, and pastes the one you pick into whatever
 window you were working in.
 
-> The user interface is in Russian. English localisation is not implemented yet.
+The interface speaks **English and Russian**: it follows the Windows display language and
+can be pinned to either one in the settings.
 
 ## Features
 
@@ -22,6 +23,7 @@ window you were working in.
   `ExcludeClipboardContentFromMonitorProcessing`, `CanIncludeInClipboardHistory`) is
   never stored; there is also a per-process blocklist.
 - **Light / dark / system theme**, correct behaviour across monitors with different DPI.
+- **English and Russian UI**, picked from the system language or set explicitly.
 - **MSI installer** with silent install, in-place upgrades and autostart.
 
 ## Keyboard and mouse
@@ -69,7 +71,7 @@ Useful parameters:
 
 - `-SkipMsi` — build the executable only, no installer.
 - `-Arch x86|arm64` — a different architecture.
-- `-Culture en-US` — installer UI language (the app itself is Russian-only).
+- `-Culture en-US` — installer language (`en-US` or `ru-RU`; the app itself ships with both).
 
 `build.ps1` is deliberately pure ASCII. Windows PowerShell 5.1 decodes BOM-less scripts
 as the system ANSI code page, so non-ASCII characters in a script would break parsing
@@ -134,9 +136,8 @@ run: choose "More info" → "Run anyway".
 - `wiclip.log` — log, truncated at 512 KB.
 
 Uninstalling does not remove these files — the MSI never touches user history. To keep
-history out of the filesystem entirely, clear "Сохранять историю между запусками"
-(*Keep history between sessions*) in the settings: the files are deleted and history
-lives in memory only.
+history out of the filesystem entirely, clear "Keep history between sessions" in the
+settings: the files are deleted and history lives in memory only.
 
 **Security note:** history is stored in plain text, exactly like the built-in `Win+V`
 history. On shared and terminal servers keep that in mind — a password that ends up in
@@ -162,6 +163,25 @@ memory-only mode both help.
   Windows clipboard history and cannot be used.
 - Only plain text is stored; RTF/HTML formatting is lost on paste.
 
+## Localisation
+
+The app UI comes from `src/WiClip/Resources/Strings.resx` (English, the neutral language,
+compiled into the main assembly) and `Strings.ru.resx` (Russian, shipped as the `ru\`
+satellite assembly). `Strings.cs` is a thin typed accessor over `ResourceManager`, so a
+lookup always follows `CultureInfo.CurrentUICulture`.
+
+Language selection lives in `Localization.Apply()` and runs before any window is created —
+XAML resolves `{x:Static local:Strings.X}` once at load time. Changing the language in the
+settings therefore recreates the history window and the tray menu.
+
+Installer strings are separate: `installer/en-us.wxl` and `installer/ru-ru.wxl`, selected
+by `build.ps1 -Culture`. One MSI carries one installer language; the application inside it
+always carries both.
+
+To add a language: drop in `Strings.<code>.resx`, add the code to `SatelliteResourceLanguages`
+in the csproj, add an entry to the settings combo box, and (optionally) an `installer/<culture>.wxl`
+plus its LCID in `build.ps1`.
+
 ## Project layout
 
 ```
@@ -174,8 +194,12 @@ src/WiClip/
   HotKeyManager.cs       global hotkey (RegisterHotKey)
   Paster.cs              clipboard writes and Ctrl+V into the target window
   Native.cs              P/Invoke declarations
+  Resources/Strings.resx    UI strings, English (neutral)
+  Resources/Strings.ru.resx UI strings, Russian (ru satellite)
+  Localization.cs        UI language selection
 installer/
   WiClip.wxs             MSI definition (WiX 5)
+  en-us.wxl / ru-ru.wxl  installer strings
   License.rtf            licence text shown by the installer
 build.ps1                publish + file-list generation + MSI build
 ```

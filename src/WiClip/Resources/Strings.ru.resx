@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="TrayTooltip" xml:space="preserve">
+    <value>WiClip - история буфера обмена ({0})</value>
+    <comment>{0} = hotkey</comment>
+  </data>
+  <data name="MenuOpen" xml:space="preserve">
+    <value>Открыть историю	{0}</value>
+    <comment>{0} = hotkey</comment>
+  </data>
+  <data name="MenuClear" xml:space="preserve">
+    <value>Очистить историю</value>
+  </data>
+  <data name="MenuSettings" xml:space="preserve">
+    <value>Настройки…</value>
+  </data>
+  <data name="MenuExit" xml:space="preserve">
+    <value>Выход</value>
+  </data>
+  <data name="ClearConfirm" xml:space="preserve">
+    <value>Удалить всю историю буфера обмена? Закреплённые записи останутся.</value>
+  </data>
+  <data name="BalloonStarted" xml:space="preserve">
+    <value>История буфера обмена включена. Вызов: {0}</value>
+    <comment>{0} = hotkey</comment>
+  </data>
+  <data name="WindowTitle" xml:space="preserve">
+    <value>Буфер обмена</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Поиск по истории…</value>
+  </data>
+  <data name="TooltipSettings" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="TooltipClose" xml:space="preserve">
+    <value>Закрыть (Esc)</value>
+  </data>
+  <data name="EmptyHistory" xml:space="preserve">
+    <value>Пока пусто. Скопируйте что-нибудь — запись появится здесь.</value>
+  </data>
+  <data name="EmptySearch" xml:space="preserve">
+    <value>Ничего не найдено.</value>
+  </data>
+  <data name="Hints" xml:space="preserve">
+    <value>Клик — скопировать · Двойной клик или Enter — вставить · Alt+1…9 — быстрый выбор · Ctrl+P — закрепить · Shift+Delete — удалить · Esc — закрыть</value>
+  </data>
+  <data name="ToastCopied" xml:space="preserve">
+    <value>✓ Скопировано в буфер</value>
+  </data>
+  <data name="ToastCopyFailed" xml:space="preserve">
+    <value>Не удалось скопировать — буфер занят</value>
+  </data>
+  <data name="PreviewImage" xml:space="preserve">
+    <value>🖼  Изображение</value>
+  </data>
+  <data name="PreviewFilesMany" xml:space="preserve">
+    <value>📄  Файлов: {0}</value>
+    <comment>{0} = count</comment>
+  </data>
+  <data name="ImageSize" xml:space="preserve">
+    <value>Изображение {0}×{1}</value>
+    <comment>{0}x{1} = pixels</comment>
+  </data>
+  <data name="MetaChars" xml:space="preserve">
+    <value>{0} симв.</value>
+  </data>
+  <data name="TimeJustNow" xml:space="preserve">
+    <value>только что</value>
+  </data>
+  <data name="TimeMinutes" xml:space="preserve">
+    <value>{0} мин назад</value>
+  </data>
+  <data name="TimeHours" xml:space="preserve">
+    <value>{0} ч назад</value>
+  </data>
+  <data name="TimeDays" xml:space="preserve">
+    <value>{0} дн назад</value>
+  </data>
+  <data name="SettingsTitle" xml:space="preserve">
+    <value>Настройки WiClip</value>
+  </data>
+  <data name="LabelHotKey" xml:space="preserve">
+    <value>Горячая клавиша</value>
+  </data>
+  <data name="HintHotKey" xml:space="preserve">
+    <value>Например: Ctrl+Shift+V, Alt+`, Win+Shift+C</value>
+  </data>
+  <data name="LabelMaxItems" xml:space="preserve">
+    <value>Сколько записей хранить</value>
+  </data>
+  <data name="LabelTheme" xml:space="preserve">
+    <value>Оформление</value>
+  </data>
+  <data name="ThemeAuto" xml:space="preserve">
+    <value>Как в системе</value>
+  </data>
+  <data name="ThemeLight" xml:space="preserve">
+    <value>Светлое</value>
+  </data>
+  <data name="ThemeDark" xml:space="preserve">
+    <value>Тёмное</value>
+  </data>
+  <data name="LabelLanguage" xml:space="preserve">
+    <value>Язык</value>
+  </data>
+  <data name="LanguageAuto" xml:space="preserve">
+    <value>Как в системе</value>
+  </data>
+  <data name="CheckAutostart" xml:space="preserve">
+    <value>Запускать при входе в Windows</value>
+  </data>
+  <data name="CheckAutostartByInstaller" xml:space="preserve">
+    <value>Запускать при входе в Windows (задано установщиком для всех)</value>
+  </data>
+  <data name="CheckPersist" xml:space="preserve">
+    <value>Сохранять историю между запусками</value>
+  </data>
+  <data name="CheckImages" xml:space="preserve">
+    <value>Запоминать изображения</value>
+  </data>
+  <data name="CheckPaste" xml:space="preserve">
+    <value>Сразу вставлять выбранное в активное окно</value>
+  </data>
+  <data name="CheckSecret" xml:space="preserve">
+    <value>Не запоминать буфер менеджеров паролей</value>
+  </data>
+  <data name="LabelIgnored" xml:space="preserve">
+    <value>Не запоминать копирование из процессов (через запятую)</value>
+  </data>
+  <data name="ButtonDataFolder" xml:space="preserve">
+    <value>Папка с данными</value>
+  </data>
+  <data name="ButtonCancel" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="ButtonSave" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="LanguageRestartNote" xml:space="preserve">
+    <value>Язык применится к окнам, открытым после сохранения.</value>
+  </data>
+  <data name="ErrHotKeyNotSet" xml:space="preserve">
+    <value>Сочетание не задано.</value>
+  </data>
+  <data name="ErrHotKeyNoKey" xml:space="preserve">
+    <value>В сочетании нет основной клавиши.</value>
+  </data>
+  <data name="ErrHotKeyNoModifier" xml:space="preserve">
+    <value>Нужен хотя бы один модификатор (Ctrl, Alt, Shift или Win).</value>
+  </data>
+  <data name="ErrHotKeyUnknownKey" xml:space="preserve">
+    <value>Не удалось распознать клавишу «{0}».</value>
+  </data>
+  <data name="ErrHotKeyUnsupported" xml:space="preserve">
+    <value>Клавиша «{0}» не поддерживается.</value>
+  </data>
+  <data name="ErrHotKeyTaken" xml:space="preserve">
+    <value>Сочетание «{0}» уже занято другой программой. Выберите другое в настройках WiClip.</value>
+  </data>
+  <data name="ErrHotKeyInvalid" xml:space="preserve">
+    <value>Некорректное сочетание клавиш.</value>
+  </data>
+  <data name="ErrMaxItems" xml:space="preserve">
+    <value>Количество записей должно быть числом от 1 до 10000.</value>
+  </data>
+</root>

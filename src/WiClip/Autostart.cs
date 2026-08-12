@@ -61,7 +61,7 @@ public static class Autostart
         }
         catch (Exception ex)
         {
-            Log.Warn($"Не удалось изменить автозапуск: {ex.Message}");
+            Log.Warn($"Could not change autostart: {ex.Message}");
         }
     }
 }

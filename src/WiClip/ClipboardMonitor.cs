@@ -36,10 +36,10 @@ public sealed class ClipboardMonitor : IDisposable
         _fmtCanIncludeHistory = Native.RegisterClipboardFormat("CanIncludeInClipboardHistory");
 
         if (Native.AddClipboardFormatListener(_hwnd))
-            Log.Info($"Слушатель буфера обмена подключён (hwnd 0x{hwnd.ToInt64():X}).");
+            Log.Info($"Clipboard listener attached (hwnd 0x{hwnd.ToInt64():X}).");
         else
-            Log.Error($"AddClipboardFormatListener не сработал (код {Marshal.GetLastWin32Error()}), " +
-                      "работаем только на опросе.");
+            Log.Error($"AddClipboardFormatListener failed (code {Marshal.GetLastWin32Error()}), " +
+                      "falling back to polling only.");
 
         _lastSequence = Native.GetClipboardSequenceNumber();
 
@@ -60,7 +60,7 @@ public sealed class ClipboardMonitor : IDisposable
     {
         if (msg != Native.WM_CLIPBOARDUPDATE) return false;
         _lastSequence = Native.GetClipboardSequenceNumber();
-        Log.Info("WM_CLIPBOARDUPDATE: буфер изменился.");
+        Log.Info("WM_CLIPBOARDUPDATE: clipboard changed.");
         _ = CaptureAsync(++_generation);
         return true;
     }
@@ -71,7 +71,7 @@ public sealed class ClipboardMonitor : IDisposable
         if (seq == _lastSequence) return;
 
         _lastSequence = seq;
-        Log.Info($"Опрос: счётчик буфера изменился ({seq}).");
+        Log.Info($"Polling: clipboard sequence changed ({seq}).");
         _ = CaptureAsync(++_generation);
     }
 
@@ -79,20 +79,20 @@ public sealed class ClipboardMonitor : IDisposable
     {
         if (DateTime.UtcNow < _suppressUntil)
         {
-            Log.Info("Пропуск: это наша собственная запись в буфер.");
+            Log.Info("Skipped: this is our own clipboard write.");
             return;
         }
 
         var (sourceApp, ownerHwnd) = GetClipboardOwnerApp();
         if (IsIgnoredProcess(sourceApp))
         {
-            Log.Info($"Пропуск буфера из процесса {sourceApp} (в списке игнорируемых).");
+            Log.Info($"Skipped clipboard from process {sourceApp} (blocklisted).");
             return;
         }
 
         if (_settings.RespectSecretClipboard && IsMarkedSecret())
         {
-            Log.Info("Пропуск буфера, помеченного как секретный.");
+            Log.Info("Skipped clipboard marked as secret.");
             return;
         }
 
@@ -105,23 +105,23 @@ public sealed class ClipboardMonitor : IDisposable
                 var item = ReadClipboard(sourceApp, ownerHwnd);
                 if (item is null)
                 {
-                    Log.Info("В буфере нет данных подходящего формата — пропуск.");
+                    Log.Info("No supported format in the clipboard - skipped.");
                     return;
                 }
 
                 _store.Add(item);
-                Log.Info($"Добавлено в историю: {item.Kind}, источник «{item.SourceApp}». " +
-                         $"Всего записей: {_store.Items.Count}.");
+                Log.Info($"Added to history: {item.Kind}, source '{item.SourceApp}'. " +
+                         $"Total entries: {_store.Items.Count}.");
                 return;
             }
             catch (Exception ex) when (attempt < 5)
             {
-                Log.Warn($"Буфер занят ({ex.GetType().Name}), попытка {attempt + 1}.");
+                Log.Warn($"Clipboard busy ({ex.GetType().Name}), attempt {attempt + 1}.");
                 await Task.Delay(120);
             }
             catch (Exception ex)
             {
-                Log.Error($"Не удалось прочитать буфер: {ex.Message}");
+                Log.Error($"Could not read the clipboard: {ex.Message}");
                 return;
             }
         }
@@ -138,7 +138,7 @@ public sealed class ClipboardMonitor : IDisposable
             if (string.IsNullOrWhiteSpace(text)) return null;
             if (text.Length > _settings.MaxTextLength)
             {
-                Log.Info($"Текст {text.Length} симв. — длиннее лимита, не сохраняем.");
+                Log.Info($"Text of {text.Length} chars exceeds the limit - not stored.");
                 return null;
             }
             return new ClipItem { Kind = ClipKind.Text, Text = text, SourceApp = app };
@@ -164,7 +164,7 @@ public sealed class ClipboardMonitor : IDisposable
             var item = new ClipItem { Kind = ClipKind.Image, SourceApp = app };
             item.ImageFile = SaveImage(image, item.Id);
             if (item.ImageFile is null) return null;
-            item.Text = $"Изображение {image.PixelWidth}×{image.PixelHeight}";
+            item.Text = Strings.Format("ImageSize", image.PixelWidth, image.PixelHeight);
             return item;
         }
 
@@ -187,7 +187,7 @@ public sealed class ClipboardMonitor : IDisposable
         }
         catch (Exception ex)
         {
-            Log.Error($"Не удалось сохранить изображение: {ex.Message}");
+            Log.Error($"Could not save the image: {ex.Message}");
             return null;
         }
     }

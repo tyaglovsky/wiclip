@@ -27,6 +27,9 @@ public sealed class AppSettings
     /// <summary>Auto | Light | Dark</summary>
     public string Theme { get; set; } = "Auto";
 
+    /// <summary>Язык интерфейса: Auto (как в системе), en, ru.</summary>
+    public string Language { get; set; } = "Auto";
+
     /// <summary>Не запоминать содержимое, скопированное из этих процессов (без .exe).</summary>
     public List<string> IgnoredProcesses { get; set; } = new()
     {
@@ -64,7 +67,7 @@ public sealed class AppSettings
         }
         catch (Exception ex)
         {
-            Log.Warn($"Не удалось прочитать settings.json: {ex.Message}");
+            Log.Warn($"Could not read settings.json: {ex.Message}");
         }
         return new AppSettings();
     }
@@ -78,7 +81,7 @@ public sealed class AppSettings
         }
         catch (Exception ex)
         {
-            Log.Warn($"Не удалось сохранить settings.json: {ex.Message}");
+            Log.Warn($"Could not save settings.json: {ex.Message}");
         }
     }
 }

@@ -65,8 +65,8 @@ public partial class HistoryWindow : Window
         if (List.Items.Count > 0) List.SelectedIndex = 0;
         UpdateEmptyState();
 
-        Log.Info($"Окно истории открыто: записей в истории {_store.Items.Count}, " +
-                 $"показано {List.Items.Count}.");
+        Log.Info($"History window opened: {_store.Items.Count} entries in history, " +
+                 $"{List.Items.Count} shown.");
     }
 
     private void PositionNearCursor()
@@ -102,7 +102,7 @@ public partial class HistoryWindow : Window
         }
         catch (Exception ex)
         {
-            Log.Warn($"Не удалось позиционировать окно: {ex.Message}");
+            Log.Warn($"Could not position the window: {ex.Message}");
         }
     }
 
@@ -115,9 +115,7 @@ public partial class HistoryWindow : Window
     private void UpdateEmptyState()
     {
         EmptyHint.Visibility = List.Items.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
-        EmptyHint.Text = _store.Items.Count == 0
-            ? "Пока пусто. Скопируйте что-нибудь — запись появится здесь."
-            : "Ничего не найдено.";
+        EmptyHint.Text = _store.Items.Count == 0 ? Strings.EmptyHistory : Strings.EmptySearch;
         SearchHint.Visibility = string.IsNullOrEmpty(SearchBox.Text)
             ? Visibility.Visible
             : Visibility.Collapsed;
@@ -245,10 +243,7 @@ public partial class HistoryWindow : Window
     {
         _monitor.SuppressNext();
 
-        if (Paster.CopyToClipboard(item))
-            ShowToast(item.Kind == ClipKind.Text ? "✓ Скопировано в буфер" : "✓ Скопировано");
-        else
-            ShowToast("Не удалось скопировать — буфер занят");
+        ShowToast(Paster.CopyToClipboard(item) ? Strings.ToastCopied : Strings.ToastCopyFailed);
     }
 
     private void ShowToast(string text)

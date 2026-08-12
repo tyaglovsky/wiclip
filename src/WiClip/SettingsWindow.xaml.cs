@@ -25,7 +25,7 @@ public partial class SettingsWindow : Window
             // Запись сделана установщиком в HKLM — из настроек её не снять без прав админа.
             AutostartBox.IsChecked = true;
             AutostartBox.IsEnabled = false;
-            AutostartBox.Content = "Запускать при входе в Windows (задано установщиком для всех)";
+            AutostartBox.Content = Strings.CheckAutostartByInstaller;
         }
         else
         {
@@ -33,11 +33,17 @@ public partial class SettingsWindow : Window
         }
         IgnoredBox.Text = string.Join(", ", settings.IgnoredProcesses);
 
-        foreach (ComboBoxItem item in ThemeBox.Items)
+        Select(ThemeBox, settings.Theme);
+        Select(LanguageBox, settings.Language);
+    }
+
+    private static void Select(ComboBox box, string tag)
+    {
+        foreach (ComboBoxItem item in box.Items)
         {
-            if ((string)item.Tag == settings.Theme) ThemeBox.SelectedItem = item;
+            if ((string)item.Tag == tag) box.SelectedItem = item;
         }
-        ThemeBox.SelectedItem ??= ThemeBox.Items[0];
+        box.SelectedItem ??= box.Items[0];
     }
 
     private void OkButton_Click(object sender, RoutedEventArgs e)
@@ -45,13 +51,13 @@ public partial class SettingsWindow : Window
         var hotKey = HotKeyBox.Text.Trim();
         if (!HotKeyManager.TryParse(hotKey, out _, out _, out var error))
         {
-            ShowError(error ?? "Некорректное сочетание клавиш.");
+            ShowError(error ?? Strings.ErrHotKeyInvalid);
             return;
         }
 
         if (!int.TryParse(MaxItemsBox.Text.Trim(), out var maxItems) || maxItems < 1 || maxItems > 10_000)
         {
-            ShowError("Количество записей должно быть числом от 1 до 10000.");
+            ShowError(Strings.ErrMaxItems);
             return;
         }
 
@@ -62,6 +68,7 @@ public partial class SettingsWindow : Window
         _settings.PasteOnSelect = PasteBox.IsChecked == true;
         _settings.RespectSecretClipboard = SecretBox.IsChecked == true;
         _settings.Theme = (string)((ComboBoxItem)ThemeBox.SelectedItem).Tag;
+        _settings.Language = (string)((ComboBoxItem)LanguageBox.SelectedItem).Tag;
         _settings.IgnoredProcesses = IgnoredBox.Text
             .Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
             .Select(s => s.Trim())
@@ -95,7 +102,7 @@ public partial class SettingsWindow : Window
         }
         catch (Exception ex)
         {
-            Log.Warn($"Не удалось открыть папку данных: {ex.Message}");
+            Log.Warn($"Could not open the data folder: {ex.Message}");
         }
     }
 }

@@ -50,12 +50,12 @@ public static class Paster
             }
             catch (Exception ex)
             {
-                Log.Warn($"Буфер занят при записи ({ex.GetType().Name}), попытка {attempt + 1}.");
+                Log.Warn($"Clipboard busy while writing ({ex.GetType().Name}), attempt {attempt + 1}.");
                 Thread.Sleep(80);
             }
         }
 
-        Log.Error("Не удалось записать данные в буфер обмена.");
+        Log.Error("Could not write to the clipboard.");
         return false;
     }
 
@@ -93,12 +93,12 @@ public static class Paster
                 System.Runtime.InteropServices.Marshal.SizeOf<Native.INPUT>());
 
             if (sent != inputs.Length)
-                Log.Warn($"SendInput отправил {sent} из {inputs.Length} событий " +
-                         "(целевое окно может работать с более высокими правами).");
+                Log.Warn($"SendInput delivered {sent} of {inputs.Length} events " +
+                         "(the target window may run elevated).");
         }
         catch (Exception ex)
         {
-            Log.Error($"Вставка не удалась: {ex.Message}");
+            Log.Error($"Paste failed: {ex.Message}");
         }
     }
 }

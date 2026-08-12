@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="ru-RU">
+
+  <String Id="SummaryDescription" Value="WiClip — история буфера обмена для Windows" />
+  <String Id="DowngradeError" Value="Уже установлена более новая версия WiClip." />
+  <String Id="LaunchMessage" Value="WiClip требует Windows 8.1 / Server 2012 R2 или новее." />
+  <String Id="CloseAppDescription" Value="WiClip запущен и будет закрыт." />
+  <String Id="ShortcutDescription" Value="История буфера обмена" />
+
+  <String Id="FeatureMainTitle" Value="WiClip" />
+  <String Id="FeatureMainDescription" Value="Приложение и ярлык в меню «Пуск»." />
+
+  <String Id="FeatureDesktopTitle" Value="Ярлык на рабочем столе" />
+  <String Id="FeatureDesktopDescription" Value="Создать ярлык WiClip на рабочем столе." />
+
+  <String Id="FeatureAutostartTitle" Value="Автозапуск при входе в Windows" />
+  <String Id="FeatureAutostartDescription" Value="При установке «для всех пользователей» — запуск у любого пользователя машины, иначе только у текущего." />
+
+  <String Id="ExitCheckboxText" Value="Запустить WiClip" />
+
+</WixLocalization>

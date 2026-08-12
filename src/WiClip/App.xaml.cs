@@ -35,7 +35,7 @@ public partial class App : Application
             }
             catch (Exception ex)
             {
-                Log.Warn($"Не удалось разбудить работающий экземпляр: {ex.Message}");
+                Log.Warn($"Could not signal the running instance: {ex.Message}");
             }
             Shutdown();
             return;
@@ -43,11 +43,12 @@ public partial class App : Application
 
         DispatcherUnhandledException += (_, args) =>
         {
-            Log.Error($"Необработанная ошибка: {args.Exception}");
+            Log.Error($"Unhandled error: {args.Exception}");
             args.Handled = true;
         };
 
         _settings = AppSettings.Load();
+        Localization.Apply(_settings.Language);
         Theme.Apply(_settings.Theme);
 
         if (AppSettings.FirstRun)
@@ -80,10 +81,10 @@ public partial class App : Application
         else if (e.Args.Contains("--autostart", StringComparer.OrdinalIgnoreCase))
         {
             _tray.ShowBalloonTip(4000, "WiClip",
-                $"История буфера обмена включена. Вызов: {_settings.HotKey}", ToolTipIcon.Info);
+                Strings.Format("BalloonStarted", _settings.HotKey), ToolTipIcon.Info);
         }
 
-        Log.Info("WiClip запущен.");
+        Log.Info("WiClip started.");
 
         if (!e.Args.Contains("--autostart", StringComparer.OrdinalIgnoreCase) &&
             !e.Args.Contains("--silent", StringComparer.OrdinalIgnoreCase))
@@ -113,18 +114,25 @@ public partial class App : Application
         {
             Icon = LoadIcon(),
             Visible = true,
-            Text = $"WiClip — история буфера обмена ({_settings.HotKey})"
+            Text = Strings.Format("TrayTooltip", _settings.HotKey)
         };
 
         _tray.DoubleClick += (_, _) => ShowHistoryWindow();
+        RebuildTrayMenu();
+    }
+
+    /// <summary>Меню трея пересобирается при смене языка.</summary>
+    private void RebuildTrayMenu()
+    {
+        _tray.ContextMenuStrip?.Dispose();
 
         var menu = new ContextMenuStrip();
-        menu.Items.Add($"Открыть историю\t{_settings.HotKey}", null, (_, _) => ShowHistoryWindow());
+        menu.Items.Add(Strings.Format("MenuOpen", _settings.HotKey), null, (_, _) => ShowHistoryWindow());
         menu.Items.Add(new ToolStripSeparator());
-        menu.Items.Add("Очистить историю", null, (_, _) => ClearHistory());
-        menu.Items.Add("Настройки…", null, (_, _) => ShowSettings());
+        menu.Items.Add(Strings.MenuClear, null, (_, _) => ClearHistory());
+        menu.Items.Add(Strings.MenuSettings, null, (_, _) => ShowSettings());
         menu.Items.Add(new ToolStripSeparator());
-        menu.Items.Add("Выход", null, (_, _) => ExitApp());
+        menu.Items.Add(Strings.MenuExit, null, (_, _) => ExitApp());
         _tray.ContextMenuStrip = menu;
     }
 
@@ -137,7 +145,7 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            Log.Warn($"Не удалось загрузить иконку: {ex.Message}");
+            Log.Warn($"Could not load the tray icon: {ex.Message}");
         }
         return SystemIcons.Application;
     }
@@ -159,7 +167,7 @@ public partial class App : Application
     private void ClearHistory()
     {
         var result = System.Windows.MessageBox.Show(
-            "Удалить всю историю буфера обмена? Закреплённые записи останутся.",
+            Strings.ClearConfirm,
             "WiClip", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
         if (result == MessageBoxResult.Yes) _store.Clear();
@@ -171,8 +179,15 @@ public partial class App : Application
         if (dlg.ShowDialog() != true) return;
 
         _settings.Save();
+        Localization.Apply(_settings.Language);
         Theme.Apply(_settings.Theme);
         ApplySettings();
+        RebuildTrayMenu();
+
+        // Строки в XAML читаются один раз при загрузке окна — пересоздаём его,
+        // иначе смена языка не была бы видна до перезапуска.
+        _window?.CloseForReal();
+        _window = null;
     }
 
     /// <summary>Применить настройки, которые влияют не только на внешний вид.</summary>
@@ -182,7 +197,7 @@ public partial class App : Application
         if (error is not null)
             _tray.ShowBalloonTip(7000, "WiClip", error, ToolTipIcon.Warning);
 
-        _tray.Text = $"WiClip — история буфера обмена ({_settings.HotKey})";
+        _tray.Text = Strings.Format("TrayTooltip", _settings.HotKey);
 
         if (!_settings.PersistHistory) HistoryStore.PurgeDisk();
         else _store.Save();
@@ -190,7 +205,7 @@ public partial class App : Application
 
     private void ExitApp()
     {
-        Log.Info("WiClip завершает работу.");
+        Log.Info("WiClip is shutting down.");
         _window?.CloseForReal();
         _window = null;
         Shutdown();

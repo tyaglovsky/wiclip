@@ -23,13 +23,10 @@ public sealed class HotKeyManager : IDisposable
             return error;
 
         if (!Native.RegisterHotKey(_hwnd, HotKeyId, mods | Native.MOD_NOREPEAT, vk))
-        {
-            return $"Сочетание «{hotKey}» уже занято другой программой. " +
-                   "Выберите другое в настройках WiClip.";
-        }
+            return Strings.Format("ErrHotKeyTaken", hotKey);
 
         _registered = true;
-        Log.Info($"Горячая клавиша зарегистрирована: {hotKey}");
+        Log.Info($"Hotkey registered: {hotKey}");
         return null;
     }
 
@@ -55,7 +52,7 @@ public sealed class HotKeyManager : IDisposable
 
         if (string.IsNullOrWhiteSpace(hotKey))
         {
-            error = "Сочетание не задано.";
+            error = Strings.ErrHotKeyNotSet;
             return false;
         }
 
@@ -75,13 +72,13 @@ public sealed class HotKeyManager : IDisposable
 
         if (keyPart is null)
         {
-            error = "В сочетании нет основной клавиши.";
+            error = Strings.ErrHotKeyNoKey;
             return false;
         }
 
         if (mods == 0)
         {
-            error = "Нужен хотя бы один модификатор (Ctrl, Alt, Shift или Win).";
+            error = Strings.ErrHotKeyNoModifier;
             return false;
         }
 
@@ -106,14 +103,14 @@ public sealed class HotKeyManager : IDisposable
 
         if (!Enum.TryParse<Key>(normalized, ignoreCase: true, out var key) || key == Key.None)
         {
-            error = $"Не удалось распознать клавишу «{keyPart}».";
+            error = Strings.Format("ErrHotKeyUnknownKey", keyPart);
             return false;
         }
 
         vk = (uint)KeyInterop.VirtualKeyFromKey(key);
         if (vk == 0)
         {
-            error = $"Клавиша «{keyPart}» не поддерживается.";
+            error = Strings.Format("ErrHotKeyUnsupported", keyPart);
             return false;
         }
 

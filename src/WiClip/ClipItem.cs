@@ -38,12 +38,12 @@ public sealed class ClipItem : INotifyPropertyChanged
             switch (Kind)
             {
                 case ClipKind.Image:
-                    return "🖼  Изображение";
+                    return Strings.PreviewImage;
                 case ClipKind.Files:
                     var files = Text.Split('\n', StringSplitOptions.RemoveEmptyEntries);
                     return files.Length == 1
-                        ? "📄  " + Path.GetFileName(files[0].Trim())
-                        : $"📄  Файлов: {files.Length}";
+                        ? "\U0001F4C4  " + Path.GetFileName(files[0].Trim())
+                        : Strings.Format("PreviewFilesMany", files.Length);
                 default:
                     var t = Text.Trim();
                     var nl = t.IndexOfAny(new[] { '\r', '\n' });
@@ -61,7 +61,9 @@ public sealed class ClipItem : INotifyPropertyChanged
         get
         {
             var when = Humanize(DateTime.UtcNow - CreatedUtc);
-            var size = Kind == ClipKind.Text ? $" · {Text.Length} симв." : string.Empty;
+            var size = Kind == ClipKind.Text
+                ? " · " + Strings.Format("MetaChars", Text.Length)
+                : string.Empty;
             var app = string.IsNullOrEmpty(SourceApp) ? string.Empty : $" · {SourceApp}";
             return when + size + app;
         }
@@ -93,7 +95,7 @@ public sealed class ClipItem : INotifyPropertyChanged
             }
             catch (Exception ex)
             {
-                Log.Warn($"Не удалось загрузить миниатюру {ImageFile}: {ex.Message}");
+                Log.Warn($"Could not load thumbnail {ImageFile}: {ex.Message}");
             }
             return _thumb;
         }
@@ -113,10 +115,10 @@ public sealed class ClipItem : INotifyPropertyChanged
 
     private static string Humanize(TimeSpan span)
     {
-        if (span.TotalSeconds < 60) return "только что";
-        if (span.TotalMinutes < 60) return $"{(int)span.TotalMinutes} мин назад";
-        if (span.TotalHours < 24) return $"{(int)span.TotalHours} ч назад";
-        return $"{(int)span.TotalDays} дн назад";
+        if (span.TotalSeconds < 60) return Strings.TimeJustNow;
+        if (span.TotalMinutes < 60) return Strings.Format("TimeMinutes", (int)span.TotalMinutes);
+        if (span.TotalHours < 24) return Strings.Format("TimeHours", (int)span.TotalHours);
+        return Strings.Format("TimeDays", (int)span.TotalDays);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

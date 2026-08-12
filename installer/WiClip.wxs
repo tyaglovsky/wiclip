@@ -7,22 +7,22 @@
            Manufacturer="WiClip"
            Version="$(var.Version)"
            UpgradeCode="7B4E1F42-9C63-4B6A-9E1D-2A8C5F0D3E71"
-           Language="1049"
+           Language="$(var.Lang)"
            Scope="perUserOrMachine"
            Compressed="yes"
            InstallerVersion="500">
 
-    <SummaryInformation Description="WiClip — история буфера обмена для Windows"
+    <SummaryInformation Description="!(loc.SummaryDescription)"
                         Manufacturer="WiClip" />
 
     <!-- Обновление поверх: старая версия удаляется автоматически -->
-    <MajorUpgrade DowngradeErrorMessage="Уже установлена более новая версия WiClip." />
+    <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
 
     <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
 
     <!-- Windows 10 / 11 / Server 2016 и новее -->
     <Launch Condition="Installed OR (VersionNT &gt;= 603)"
-            Message="WiClip требует Windows 8.1 / Server 2012 R2 или новее." />
+            Message="!(loc.LaunchMessage)" />
 
     <Property Id="ARPPRODUCTICON" Value="WiClipIcon.exe" />
     <Property Id="ARPNOREPAIR" Value="1" />
@@ -33,7 +33,7 @@
                            Target="WiClip.exe"
                            CloseMessage="yes"
                            RebootPrompt="no"
-                           Description="WiClip запущен и будет закрыт." />
+                           Description="!(loc.CloseAppDescription)" />
 
     <!-- Каталог установки. Для «только для меня» мастер сам подменяет путь
          на %LocalAppData%\Programs\WiClip. -->
@@ -50,7 +50,7 @@
         <Shortcut Id="StartMenuWiClip"
                   Directory="ProgramMenuFolder"
                   Name="WiClip"
-                  Description="История буфера обмена"
+                  Description="!(loc.ShortcutDescription)"
                   Target="[APPLICATIONFOLDER]WiClip.exe"
                   WorkingDirectory="APPLICATIONFOLDER" />
         <RegistryValue Root="HKMU" Key="Software\WiClip"
@@ -63,7 +63,7 @@
         <Shortcut Id="DesktopWiClip"
                   Directory="DesktopFolder"
                   Name="WiClip"
-                  Description="История буфера обмена"
+                  Description="!(loc.ShortcutDescription)"
                   Target="[APPLICATIONFOLDER]WiClip.exe"
                   WorkingDirectory="APPLICATIONFOLDER" />
         <RegistryValue Root="HKMU" Key="Software\WiClip"
@@ -83,18 +83,18 @@
       </Component>
     </ComponentGroup>
 
-    <Feature Id="Main" Title="WiClip" Description="Приложение и ярлык в меню «Пуск»."
+    <Feature Id="Main" Title="!(loc.FeatureMainTitle)" Description="!(loc.FeatureMainDescription)"
              Level="1" AllowAbsent="no" ConfigurableDirectory="APPLICATIONFOLDER">
       <ComponentGroupRef Id="AppFiles" />
       <ComponentGroupRef Id="Shortcuts" />
 
-      <Feature Id="DesktopShortcutFeature" Title="Ярлык на рабочем столе"
-               Description="Создать ярлык WiClip на рабочем столе." Level="1000">
+      <Feature Id="DesktopShortcutFeature" Title="!(loc.FeatureDesktopTitle)"
+               Description="!(loc.FeatureDesktopDescription)" Level="1000">
         <ComponentGroupRef Id="DesktopShortcutGroup" />
       </Feature>
 
-      <Feature Id="AutostartFeature" Title="Автозапуск при входе в Windows"
-               Description="При установке «для всех пользователей» — запуск у любого пользователя машины, иначе только у текущего."
+      <Feature Id="AutostartFeature" Title="!(loc.FeatureAutostartTitle)"
+               Description="!(loc.FeatureAutostartDescription)"
                Level="1">
         <ComponentGroupRef Id="AutostartGroup" />
       </Feature>
@@ -108,7 +108,7 @@
                   Impersonate="yes"
                   Return="asyncNoWait" />
 
-    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Запустить WiClip" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="!(loc.ExitCheckboxText)" />
     <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
     <WixVariable Id="WixUILicenseRtf" Value="$(var.InstallerDir)\License.rtf" />
 

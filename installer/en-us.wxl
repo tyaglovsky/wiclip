@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="en-US">
+
+  <String Id="SummaryDescription" Value="WiClip - clipboard history for Windows" />
+  <String Id="DowngradeError" Value="A newer version of WiClip is already installed." />
+  <String Id="LaunchMessage" Value="WiClip requires Windows 8.1 / Server 2012 R2 or newer." />
+  <String Id="CloseAppDescription" Value="WiClip is running and will be closed." />
+  <String Id="ShortcutDescription" Value="Clipboard history" />
+
+  <String Id="FeatureMainTitle" Value="WiClip" />
+  <String Id="FeatureMainDescription" Value="The application and a Start menu shortcut." />
+
+  <String Id="FeatureDesktopTitle" Value="Desktop shortcut" />
+  <String Id="FeatureDesktopDescription" Value="Create a WiClip shortcut on the desktop." />
+
+  <String Id="FeatureAutostartTitle" Value="Start with Windows" />
+  <String Id="FeatureAutostartDescription" Value="With an all-users install, starts for every user of the machine; otherwise only for the current user." />
+
+  <String Id="ExitCheckboxText" Value="Launch WiClip" />
+
+</WixLocalization>

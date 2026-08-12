@@ -26,7 +26,9 @@
     <SelfContained>true</SelfContained>
     <PublishSingleFile>false</PublishSingleFile>
     <PublishReadyToRun>true</PublishReadyToRun>
-    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <!-- Английский — нейтральный язык (в основной сборке), русский — сателлит ru\ -->
+    <NeutralResourcesLanguage>en</NeutralResourcesLanguage>
+    <SatelliteResourceLanguages>en;ru</SatelliteResourceLanguages>
     <!-- InvariantGlobalization включать нельзя: WPF при фокусе в текстовое поле
          запрашивает текущую раскладку и падает с CultureNotFoundException. -->
     <InvariantGlobalization>false</InvariantGlobalization>

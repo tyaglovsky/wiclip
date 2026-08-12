@@ -104,7 +104,7 @@ public sealed class HistoryStore
         }
         catch (Exception ex)
         {
-            Log.Warn($"Не удалось удалить {item.ImageFile}: {ex.Message}");
+            Log.Warn($"Could not delete {item.ImageFile}: {ex.Message}");
         }
     }
 
@@ -123,11 +123,11 @@ public sealed class HistoryStore
                 if (item.Kind == ClipKind.Image && !File.Exists(item.ImagePath)) continue;
                 Items.Add(item);
             }
-            Log.Info($"История загружена: {Items.Count} записей.");
+            Log.Info($"History loaded: {Items.Count} entries.");
         }
         catch (Exception ex)
         {
-            Log.Error($"Не удалось загрузить историю: {ex.Message}");
+            Log.Error($"Could not load history: {ex.Message}");
         }
     }
 
@@ -148,7 +148,7 @@ public sealed class HistoryStore
                 }
                 catch (Exception ex)
                 {
-                    Log.Error($"Не удалось сохранить историю: {ex.Message}");
+                    Log.Error($"Could not save history: {ex.Message}");
                 }
             }
         });
@@ -164,7 +164,7 @@ public sealed class HistoryStore
         }
         catch (Exception ex)
         {
-            Log.Warn($"Не удалось очистить данные на диске: {ex.Message}");
+            Log.Warn($"Could not purge on-disk data: {ex.Message}");
         }
     }
 }

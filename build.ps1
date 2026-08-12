@@ -182,14 +182,24 @@ foreach ($ext in @("WixToolset.UI.wixext", "WixToolset.Util.wixext")) {
 New-Item -ItemType Directory -Force -Path $distDir | Out-Null
 $msi = Join-Path $distDir "WiClip-$Version-$Arch.msi"
 
+# Installer strings live in installer\*.wxl; the LCID must match the chosen culture
+$lang = switch ($Culture) {
+    "ru-RU" { 1049 }
+    "en-US" { 1033 }
+    default { throw "Unsupported culture '$Culture'. Add a .wxl file in installer\ and map its LCID here." }
+}
+
 wix build `
     (Join-Path $installerDir "WiClip.wxs") `
     $generatedWxs `
     -arch $Arch `
     -culture $Culture `
+    -loc (Join-Path $installerDir "en-us.wxl") `
+    -loc (Join-Path $installerDir "ru-ru.wxl") `
     -ext WixToolset.UI.wixext `
     -ext WixToolset.Util.wixext `
     -d Version=$msiVersion `
+    -d Lang=$lang `
     -d PublishDir=$publishDir `
     -d InstallerDir=$installerDir `
     -o $msi

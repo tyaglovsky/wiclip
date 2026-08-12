@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="TrayTooltip" xml:space="preserve">
+    <value>WiClip - clipboard history ({0})</value>
+    <comment>{0} = hotkey</comment>
+  </data>
+  <data name="MenuOpen" xml:space="preserve">
+    <value>Open history	{0}</value>
+    <comment>{0} = hotkey</comment>
+  </data>
+  <data name="MenuClear" xml:space="preserve">
+    <value>Clear history</value>
+  </data>
+  <data name="MenuSettings" xml:space="preserve">
+    <value>Settings...</value>
+  </data>
+  <data name="MenuExit" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+  <data name="ClearConfirm" xml:space="preserve">
+    <value>Delete the whole clipboard history? Pinned entries are kept.</value>
+  </data>
+  <data name="BalloonStarted" xml:space="preserve">
+    <value>Clipboard history is running. Press {0} to open it.</value>
+    <comment>{0} = hotkey</comment>
+  </data>
+  <data name="WindowTitle" xml:space="preserve">
+    <value>Clipboard</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Search history...</value>
+  </data>
+  <data name="TooltipSettings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="TooltipClose" xml:space="preserve">
+    <value>Close (Esc)</value>
+  </data>
+  <data name="EmptyHistory" xml:space="preserve">
+    <value>Nothing here yet. Copy something and it will show up.</value>
+  </data>
+  <data name="EmptySearch" xml:space="preserve">
+    <value>Nothing found.</value>
+  </data>
+  <data name="Hints" xml:space="preserve">
+    <value>Click - copy · Double click or Enter - paste · Alt+1...9 - quick pick · Ctrl+P - pin · Shift+Delete - remove · Esc - close</value>
+  </data>
+  <data name="ToastCopied" xml:space="preserve">
+    <value>✓ Copied to clipboard</value>
+  </data>
+  <data name="ToastCopyFailed" xml:space="preserve">
+    <value>Could not copy - the clipboard is busy</value>
+  </data>
+  <data name="PreviewImage" xml:space="preserve">
+    <value>🖼  Image</value>
+  </data>
+  <data name="PreviewFilesMany" xml:space="preserve">
+    <value>📄  Files: {0}</value>
+    <comment>{0} = count</comment>
+  </data>
+  <data name="ImageSize" xml:space="preserve">
+    <value>Image {0}×{1}</value>
+    <comment>{0}x{1} = pixels</comment>
+  </data>
+  <data name="MetaChars" xml:space="preserve">
+    <value>{0} chars</value>
+  </data>
+  <data name="TimeJustNow" xml:space="preserve">
+    <value>just now</value>
+  </data>
+  <data name="TimeMinutes" xml:space="preserve">
+    <value>{0} min ago</value>
+  </data>
+  <data name="TimeHours" xml:space="preserve">
+    <value>{0} h ago</value>
+  </data>
+  <data name="TimeDays" xml:space="preserve">
+    <value>{0} d ago</value>
+  </data>
+  <data name="SettingsTitle" xml:space="preserve">
+    <value>WiClip settings</value>
+  </data>
+  <data name="LabelHotKey" xml:space="preserve">
+    <value>Hotkey</value>
+  </data>
+  <data name="HintHotKey" xml:space="preserve">
+    <value>For example: Ctrl+Shift+V, Alt+`, Win+Shift+C</value>
+  </data>
+  <data name="LabelMaxItems" xml:space="preserve">
+    <value>How many entries to keep</value>
+  </data>
+  <data name="LabelTheme" xml:space="preserve">
+    <value>Appearance</value>
+  </data>
+  <data name="ThemeAuto" xml:space="preserve">
+    <value>Match system</value>
+  </data>
+  <data name="ThemeLight" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="ThemeDark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="LabelLanguage" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="LanguageAuto" xml:space="preserve">
+    <value>Match system</value>
+  </data>
+  <data name="CheckAutostart" xml:space="preserve">
+    <value>Start with Windows</value>
+  </data>
+  <data name="CheckAutostartByInstaller" xml:space="preserve">
+    <value>Start with Windows (set by the installer for all users)</value>
+  </data>
+  <data name="CheckPersist" xml:space="preserve">
+    <value>Keep history between sessions</value>
+  </data>
+  <data name="CheckImages" xml:space="preserve">
+    <value>Remember images</value>
+  </data>
+  <data name="CheckPaste" xml:space="preserve">
+    <value>Paste the picked entry into the active window</value>
+  </data>
+  <data name="CheckSecret" xml:space="preserve">
+    <value>Ignore clipboard from password managers</value>
+  </data>
+  <data name="LabelIgnored" xml:space="preserve">
+    <value>Do not record copies from these processes (comma separated)</value>
+  </data>
+  <data name="ButtonDataFolder" xml:space="preserve">
+    <value>Data folder</value>
+  </data>
+  <data name="ButtonCancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="ButtonSave" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="LanguageRestartNote" xml:space="preserve">
+    <value>The language applies to windows opened from now on.</value>
+  </data>
+  <data name="ErrHotKeyNotSet" xml:space="preserve">
+    <value>No shortcut specified.</value>
+  </data>
+  <data name="ErrHotKeyNoKey" xml:space="preserve">
+    <value>The shortcut has no main key.</value>
+  </data>
+  <data name="ErrHotKeyNoModifier" xml:space="preserve">
+    <value>At least one modifier is required (Ctrl, Alt, Shift or Win).</value>
+  </data>
+  <data name="ErrHotKeyUnknownKey" xml:space="preserve">
+    <value>Could not recognise the key "{0}".</value>
+  </data>
+  <data name="ErrHotKeyUnsupported" xml:space="preserve">
+    <value>The key "{0}" is not supported.</value>
+  </data>
+  <data name="ErrHotKeyTaken" xml:space="preserve">
+    <value>The shortcut "{0}" is already taken by another program. Pick a different one in WiClip settings.</value>
+  </data>
+  <data name="ErrHotKeyInvalid" xml:space="preserve">
+    <value>Invalid shortcut.</value>
+  </data>
+  <data name="ErrMaxItems" xml:space="preserve">
+    <value>The number of entries must be between 1 and 10000.</value>
+  </data>
+</root>
