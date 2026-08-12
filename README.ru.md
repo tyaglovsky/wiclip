@@ -67,13 +67,13 @@ dotnet tool install --global wix --version 5.0.2
 ```
 
 - `-SkipMsi` — собрать только exe, без установщика.
-- `build.ps1` должен оставаться в кодировке **UTF-8 с BOM**: Windows PowerShell 5.1 читает
-  скрипты без BOM как cp1251 и ломается на русских комментариях (`UnexpectedToken`).
-  Если редактор снял BOM — вернуть его можно так:
-  `$p='.\build.ps1'; $t=[IO.File]::ReadAllText($p,[Text.Encoding]::UTF8); [IO.File]::WriteAllText($p,$t,(New-Object Text.UTF8Encoding $true))`.
-  В PowerShell 7 (`pwsh`) этой проблемы нет.
 - `-Arch x86|arm64` — другая разрядность.
 - `-Culture en-US` — язык интерфейса установщика (интерфейс самой программы всегда русский).
+
+`build.ps1` намеренно написан только латиницей. Windows PowerShell 5.1 читает скрипты без
+BOM в системной кодировке (cp1251), поэтому кириллица в коде ломала бы разбор
+(`UnexpectedToken`), если бы файл не хранился как UTF-8 с BOM. ASCII снимает вопрос
+целиком — новые комментарии и сообщения тоже пишите по-английски.
 
 Приложение публикуется **self-contained**: .NET Desktop Runtime на целевой машине
 не нужен, что удобно для серверов и закрытых контуров. Цена — размер MSI около 70–90 МБ.

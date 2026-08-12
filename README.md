@@ -70,10 +70,11 @@ Useful parameters:
 - `-SkipMsi` — build the executable only, no installer.
 - `-Arch x86|arm64` — a different architecture.
 - `-Culture en-US` — installer UI language (the app itself is Russian-only).
-- `build.ps1` must stay **UTF-8 with BOM**: Windows PowerShell 5.1 reads BOM-less scripts
-  as cp1251 and chokes on the Russian comments (`UnexpectedToken`). To restore the BOM:
-  `$p='.\build.ps1'; $t=[IO.File]::ReadAllText($p,[Text.Encoding]::UTF8); [IO.File]::WriteAllText($p,$t,(New-Object Text.UTF8Encoding $true))`.
-  PowerShell 7 (`pwsh`) does not have this problem.
+
+`build.ps1` is deliberately pure ASCII. Windows PowerShell 5.1 decodes BOM-less scripts
+as the system ANSI code page, so non-ASCII characters in a script would break parsing
+(`UnexpectedToken`) unless the file carried a UTF-8 BOM. Keeping it ASCII sidesteps the
+issue entirely — please keep new comments and messages in English.
 
 The app is published **self-contained**, so no .NET Desktop Runtime is required on the
 target machine — convenient for servers and locked-down environments. The price is an
