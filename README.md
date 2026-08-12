@@ -61,7 +61,7 @@ Then, from the repository root:
 .\build.ps1
 ```
 
-This produces `dist\WiClip-1.0.0-x64.msi` and a ready-to-run app in `publish\x64`.
+This produces `dist\WiClip-1.0.1-x64.msi` and a ready-to-run app in `publish\x64`.
 
 Useful parameters:
 
@@ -98,23 +98,23 @@ Silent install:
 
 ```powershell
 # all users (default, requires administrator rights)
-msiexec /i WiClip-1.0.0-x64.msi /qn
+msiexec /i WiClip-1.0.1-x64.msi /qn
 
 # current user only, no elevation
-msiexec /i WiClip-1.0.0-x64.msi /qn MSIINSTALLPERUSER=1
+msiexec /i WiClip-1.0.1-x64.msi /qn MSIINSTALLPERUSER=1
 ```
 
 Other options:
 
 ```powershell
 # no autostart, but with a desktop shortcut
-msiexec /i WiClip-1.0.0-x64.msi /qn ADDLOCAL=Main,DesktopShortcutFeature
+msiexec /i WiClip-1.0.1-x64.msi /qn ADDLOCAL=Main,DesktopShortcutFeature
 
 # custom directory
-msiexec /i WiClip-1.0.0-x64.msi /qn APPLICATIONFOLDER="D:\Apps\WiClip"
+msiexec /i WiClip-1.0.1-x64.msi /qn APPLICATIONFOLDER="D:\Apps\WiClip"
 
 # uninstall
-msiexec /x WiClip-1.0.0-x64.msi /qn
+msiexec /x WiClip-1.0.1-x64.msi /qn
 ```
 
 Features: `Main` (required), `AutostartFeature` (autostart, enabled by default),

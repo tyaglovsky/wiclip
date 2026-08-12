@@ -61,7 +61,7 @@ dotnet tool install --global wix --version 5.0.2
 .\build.ps1
 ```
 
-Результат: `dist\WiClip-1.0.0-x64.msi` і тека `publish\x64` з готовою програмою.
+Результат: `dist\WiClip-1.0.1-x64.msi` і тека `publish\x64` з готовою програмою.
 
 Корисні параметри:
 
@@ -97,23 +97,23 @@ BOM у системному кодуванні, тож не-ASCII символи
 
 ```powershell
 # для всіх користувачів (типово, потрібні права адміністратора)
-msiexec /i WiClip-1.0.0-x64.msi /qn
+msiexec /i WiClip-1.0.1-x64.msi /qn
 
 # лише для поточного користувача, без прав адміністратора
-msiexec /i WiClip-1.0.0-x64.msi /qn MSIINSTALLPERUSER=1
+msiexec /i WiClip-1.0.1-x64.msi /qn MSIINSTALLPERUSER=1
 ```
 
 Інші варіанти:
 
 ```powershell
 # без автозапуску, але з ярликом на робочому столі
-msiexec /i WiClip-1.0.0-x64.msi /qn ADDLOCAL=Main,DesktopShortcutFeature
+msiexec /i WiClip-1.0.1-x64.msi /qn ADDLOCAL=Main,DesktopShortcutFeature
 
 # у власний каталог
-msiexec /i WiClip-1.0.0-x64.msi /qn APPLICATIONFOLDER="D:\Apps\WiClip"
+msiexec /i WiClip-1.0.1-x64.msi /qn APPLICATIONFOLDER="D:\Apps\WiClip"
 
 # видалення
-msiexec /x WiClip-1.0.0-x64.msi /qn
+msiexec /x WiClip-1.0.1-x64.msi /qn
 ```
 
 Склад компонентів: `Main` (обовʼязковий), `AutostartFeature` (автозапуск, увімкнений
