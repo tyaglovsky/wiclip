@@ -12,13 +12,41 @@ public static class Strings
     private static readonly ResourceManager Manager =
         new("WiClip.Resources.Strings", typeof(Strings).Assembly);
 
-    /// <summary>Looks a string up in the current UI culture; falls back to the key itself.</summary>
-    public static string Get(string key) =>
-        Manager.GetString(key, CultureInfo.CurrentUICulture) ?? key;
+    private static bool _resourcesBroken;
+
+    /// <summary>
+    /// Looks a string up in the current UI culture. Never throws: a missing or broken
+    /// resource must not take the whole application down, the key is shown instead.
+    /// </summary>
+    public static string Get(string key)
+    {
+        if (_resourcesBroken) return key;
+        try
+        {
+            return Manager.GetString(key, CultureInfo.CurrentUICulture) ?? key;
+        }
+        catch (Exception ex)
+        {
+            _resourcesBroken = true;
+            Log.Error($"String resources are unavailable ({ex.GetType().Name}: {ex.Message}). " +
+                      "Falling back to resource keys.");
+            return key;
+        }
+    }
 
     /// <summary>Same, but formatted with the current UI culture.</summary>
-    public static string Format(string key, params object[] args) =>
-        string.Format(CultureInfo.CurrentUICulture, Get(key), args);
+    public static string Format(string key, params object[] args)
+    {
+        try
+        {
+            return string.Format(CultureInfo.CurrentUICulture, Get(key), args);
+        }
+        catch (FormatException ex)
+        {
+            Log.Warn($"Bad format string for '{key}': {ex.Message}");
+            return Get(key);
+        }
+    }
 
     /// <summary>WiClip - clipboard history ({0})</summary>
     public static string TrayTooltip => Get("TrayTooltip");

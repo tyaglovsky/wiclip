@@ -23,6 +23,24 @@ public partial class App : Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
+        try
+        {
+            Start(e);
+        }
+        catch (Exception ex)
+        {
+            // Исключение здесь означает, что приложение вообще не поднялось:
+            // DispatcherUnhandledException до старта цикла сообщений ещё не работает.
+            Log.Error($"Startup failed: {ex}");
+            System.Windows.MessageBox.Show(
+                $"WiClip failed to start:\n\n{ex.Message}\n\nDetails: %APPDATA%\\WiClip\\wiclip.log",
+                "WiClip", MessageBoxButton.OK, MessageBoxImage.Error);
+            Shutdown(1);
+        }
+    }
+
+    private void Start(StartupEventArgs e)
+    {
         base.OnStartup(e);
 
         _mutex = new Mutex(initiallyOwned: true, MutexName, out var isFirst);
