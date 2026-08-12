@@ -183,7 +183,7 @@ public partial class App : Application
             if (_window is null)
             {
                 _window = new HistoryWindow(_store, _settings, _monitor);
-                _window.SettingsApplied += ApplySettings;
+                _window.SettingsRequested += ShowSettings;
             }
 
             _window.ShowFor(target);

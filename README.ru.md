@@ -1,6 +1,6 @@
 # WiClip — история буфера обмена для Windows
 
-[English](README.md) · **Русский**
+[English](README.md) · **Русский** · [Українська](README.uk.md)
 
 [Скачать установщик](https://github.com/tyaglovsky/wiclip/releases/latest)
 
@@ -194,5 +194,6 @@ installer/
   WiClip.wxs             описание MSI (WiX 5)
   en-us.wxl / ru-ru.wxl  строки установщика
   License.rtf            текст лицензии в установщике
+tools/gen-strings.py     генератор ресурсов локализации
 build.ps1                публикация + генерация списка файлов + сборка MSI
 ```

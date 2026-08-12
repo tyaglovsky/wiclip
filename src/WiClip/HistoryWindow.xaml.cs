@@ -18,7 +18,6 @@ public partial class HistoryWindow : Window
     private readonly DispatcherTimer _toastTimer;
 
     private IntPtr _target;
-    private bool _suppressHideOnDeactivate;
     private bool _reallyClose;
 
     public HistoryWindow(HistoryStore store, AppSettings settings, ClipboardMonitor monitor)
@@ -41,7 +40,8 @@ public partial class HistoryWindow : Window
             HintText.Visibility = Visibility.Visible;
         };
 
-        Deactivated += (_, _) => { if (!_suppressHideOnDeactivate) HideWindow(); };
+        // Клик мимо окна прячет его — как у системного Win+V.
+        Deactivated += (_, _) => HideWindow();
         PreviewKeyDown += OnPreviewKeyDown;
     }
 
@@ -260,21 +260,15 @@ public partial class HistoryWindow : Window
 
     private void SettingsButton_Click(object sender, RoutedEventArgs e)
     {
-        _suppressHideOnDeactivate = true;
         HideWindow();
-        _suppressHideOnDeactivate = false;
 
-        var dlg = new SettingsWindow(_settings);
-        if (dlg.ShowDialog() == true)
-        {
-            _settings.Save();
-            Theme.Apply(_settings.Theme);
-            SettingsApplied?.Invoke();
-        }
+        // Диалог показывает App: он же применяет язык, тему и пересобирает меню трея.
+        // BeginInvoke — чтобы обработчик клика успел завершиться до закрытия окна.
+        Dispatcher.BeginInvoke(new Action(() => SettingsRequested?.Invoke()));
     }
 
-    /// <summary>Вызывается после изменения настроек из окна истории.</summary>
-    public event Action? SettingsApplied;
+    /// <summary>Пользователь нажал шестерёнку — настройки открывает App.</summary>
+    public event Action? SettingsRequested;
 
     protected override void OnClosing(CancelEventArgs e)
     {

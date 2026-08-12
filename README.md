@@ -1,6 +1,6 @@
 # WiClip — clipboard history for Windows
 
-**English** · [Русский](README.ru.md)
+**English** · [Русский](README.ru.md) · [Українська](README.uk.md)
 
 [Download the installer](https://github.com/tyaglovsky/wiclip/releases/latest)
 
@@ -201,6 +201,7 @@ installer/
   WiClip.wxs             MSI definition (WiX 5)
   en-us.wxl / ru-ru.wxl  installer strings
   License.rtf            licence text shown by the installer
+tools/gen-strings.py     localisation resource generator
 build.ps1                publish + file-list generation + MSI build
 ```
 

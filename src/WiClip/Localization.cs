@@ -5,14 +5,6 @@ namespace WiClip;
 /// <summary>Выбор языка интерфейса. Строки берутся из Resources/Strings*.resx.</summary>
 public static class Localization
 {
-    /// <summary>Языки, между которыми можно переключаться в настройках.</summary>
-    public static readonly (string Code, string Name)[] Available =
-    {
-        ("Auto", ""),          // подпись подставляется из ресурсов
-        ("en", "English"),
-        ("ru", "Русский")
-    };
-
     /// <summary>
     /// Применить язык из настроек. «Auto» оставляет системный язык Windows.
     /// Вызывать до создания окон: XAML читает строки один раз при загрузке.
