@@ -6,3 +6,4 @@ installer/Files.generated.wxs
 *.user
 *.suo
 .vs/
+.DS_Store
