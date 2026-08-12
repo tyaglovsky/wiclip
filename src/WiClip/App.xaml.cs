@@ -135,7 +135,12 @@ public partial class App : Application
             Text = Strings.Format("TrayTooltip", _settings.HotKey)
         };
 
-        _tray.DoubleClick += (_, _) => ShowHistoryWindow();
+        // Левый клик открывает историю, правый — меню (его показывает сам NotifyIcon).
+        _tray.MouseClick += (_, args) =>
+        {
+            if (args.Button == MouseButtons.Left) ShowHistoryWindow();
+        };
+
         RebuildTrayMenu();
     }
 
@@ -173,13 +178,25 @@ public partial class App : Application
         // Окно, которое было активно до вызова — туда потом вставляем.
         var target = Native.GetForegroundWindow();
 
-        if (_window is null)
+        try
         {
-            _window = new HistoryWindow(_store, _settings, _monitor);
-            _window.SettingsApplied += ApplySettings;
-        }
+            if (_window is null)
+            {
+                _window = new HistoryWindow(_store, _settings, _monitor);
+                _window.SettingsApplied += ApplySettings;
+            }
 
-        _window.ShowFor(target);
+            _window.ShowFor(target);
+        }
+        catch (Exception ex)
+        {
+            // Без этого сбой создания окна выглядел бы как «горячая клавиша не работает».
+            Log.Error($"Could not open the history window: {ex}");
+            _window = null;
+
+            _tray.ShowBalloonTip(7000, "WiClip",
+                $"Could not open the history window: {ex.Message}", ToolTipIcon.Error);
+        }
     }
 
     private void ClearHistory()
