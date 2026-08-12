@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+
+  <Package Name="WiClip"
+           Manufacturer="WiClip"
+           Version="$(var.Version)"
+           UpgradeCode="7B4E1F42-9C63-4B6A-9E1D-2A8C5F0D3E71"
+           Language="1049"
+           Scope="perUserOrMachine"
+           Compressed="yes"
+           InstallerVersion="500">
+
+    <SummaryInformation Description="WiClip — история буфера обмена для Windows"
+                        Manufacturer="WiClip" />
+
+    <!-- Обновление поверх: старая версия удаляется автоматически -->
+    <MajorUpgrade DowngradeErrorMessage="Уже установлена более новая версия WiClip." />
+
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <!-- Windows 10 / 11 / Server 2016 и новее -->
+    <Launch Condition="Installed OR (VersionNT &gt;= 603)"
+            Message="WiClip требует Windows 8.1 / Server 2012 R2 или новее." />
+
+    <Property Id="ARPPRODUCTICON" Value="WiClipIcon.exe" />
+    <Property Id="ARPNOREPAIR" Value="1" />
+    <Icon Id="WiClipIcon.exe" SourceFile="$(var.PublishDir)\WiClip.exe" />
+
+    <!-- Перед обновлением/удалением закрываем работающий экземпляр -->
+    <util:CloseApplication Id="CloseWiClip"
+                           Target="WiClip.exe"
+                           CloseMessage="yes"
+                           RebootPrompt="no"
+                           Description="WiClip запущен и будет закрыт." />
+
+    <!-- Каталог установки. Для «только для меня» мастер сам подменяет путь
+         на %LocalAppData%\Programs\WiClip. -->
+    <StandardDirectory Id="ProgramFiles6432Folder">
+      <Directory Id="APPLICATIONFOLDER" Name="WiClip" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder" />
+    <StandardDirectory Id="DesktopFolder" />
+
+    <!-- Ярлыки -->
+    <ComponentGroup Id="Shortcuts" Directory="APPLICATIONFOLDER">
+      <Component Id="StartMenuShortcut">
+        <Shortcut Id="StartMenuWiClip"
+                  Directory="ProgramMenuFolder"
+                  Name="WiClip"
+                  Description="История буфера обмена"
+                  Target="[APPLICATIONFOLDER]WiClip.exe"
+                  WorkingDirectory="APPLICATIONFOLDER" />
+        <RegistryValue Root="HKMU" Key="Software\WiClip"
+                       Name="StartMenuShortcut" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="DesktopShortcutGroup" Directory="APPLICATIONFOLDER">
+      <Component Id="DesktopShortcut">
+        <Shortcut Id="DesktopWiClip"
+                  Directory="DesktopFolder"
+                  Name="WiClip"
+                  Description="История буфера обмена"
+                  Target="[APPLICATIONFOLDER]WiClip.exe"
+                  WorkingDirectory="APPLICATIONFOLDER" />
+        <RegistryValue Root="HKMU" Key="Software\WiClip"
+                       Name="DesktopShortcut" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <!-- Автозапуск. HKMU = HKLM при установке для всех, HKCU при установке для себя. -->
+    <ComponentGroup Id="AutostartGroup" Directory="APPLICATIONFOLDER">
+      <Component Id="AutostartEntry">
+        <RegistryValue Root="HKMU"
+                       Key="Software\Microsoft\Windows\CurrentVersion\Run"
+                       Name="WiClip"
+                       Type="string"
+                       Value="&quot;[APPLICATIONFOLDER]WiClip.exe&quot; --autostart"
+                       KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <Feature Id="Main" Title="WiClip" Description="Приложение и ярлык в меню «Пуск»."
+             Level="1" AllowAbsent="no" ConfigurableDirectory="APPLICATIONFOLDER">
+      <ComponentGroupRef Id="AppFiles" />
+      <ComponentGroupRef Id="Shortcuts" />
+
+      <Feature Id="DesktopShortcutFeature" Title="Ярлык на рабочем столе"
+               Description="Создать ярлык WiClip на рабочем столе." Level="1000">
+        <ComponentGroupRef Id="DesktopShortcutGroup" />
+      </Feature>
+
+      <Feature Id="AutostartFeature" Title="Автозапуск при входе в Windows"
+               Description="При установке «для всех пользователей» — запуск у любого пользователя машины, иначе только у текущего."
+               Level="1">
+        <ComponentGroupRef Id="AutostartGroup" />
+      </Feature>
+    </Feature>
+
+    <!-- Запуск приложения по завершении установки -->
+    <CustomAction Id="LaunchApplication"
+                  FileRef="WiClipExe"
+                  ExeCommand="--silent"
+                  Execute="immediate"
+                  Impersonate="yes"
+                  Return="asyncNoWait" />
+
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Запустить WiClip" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.InstallerDir)\License.rtf" />
+
+    <!-- Мастер с выбором «для всех пользователей / только для меня» -->
+    <Property Id="ApplicationFolderName" Value="WiClip" />
+    <Property Id="WixAppFolder" Value="WixPerMachineFolder" />
+    <ui:WixUI Id="WixUI_Advanced" />
+
+    <UI>
+      <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="LaunchApplication"
+               Condition="WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 AND NOT Installed" />
+    </UI>
+
+  </Package>
+</Wix>

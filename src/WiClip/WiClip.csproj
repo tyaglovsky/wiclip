@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>WiClip</RootNamespace>
+    <AssemblyName>WiClip</AssemblyName>
+    <ApplicationIcon>Assets\wiclip.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+
+    <Version>1.0.0</Version>
+    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <Company>WiClip</Company>
+    <Product>WiClip</Product>
+    <Description>Clipboard history manager for Windows</Description>
+
+    <!-- Self-contained: не требует установленного .NET Desktop Runtime
+         (важно для Windows Server и закрытых контуров) -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>false</PublishSingleFile>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <!-- InvariantGlobalization включать нельзя: WPF при фокусе в текстовое поле
+         запрашивает текущую раскладку и падает с CultureNotFoundException. -->
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\wiclip.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- UseWindowsForms добавляет эти namespace'ы глобально, из-за чего конфликтуют
+         одноимённые типы WPF и WinForms (Clipboard, Application, KeyEventArgs...).
+         WinForms нужен только ради иконки в трее — подключаем его точечно. -->
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+  </ItemGroup>
+
+</Project>
