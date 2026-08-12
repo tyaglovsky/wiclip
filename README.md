@@ -1,169 +1,184 @@
-# WiClip — история буфера обмена для Windows
+# WiClip — clipboard history for Windows
 
-Менеджер буфера обмена для Windows 10 / 11 / Server 2016+. Живёт в трее, по горячей
-клавише показывает окно с последними скопированными записями, выбранная запись
-вставляется в активное окно.
+**English** · [Русский](README.ru.md)
 
-## Возможности
+[Download the installer](https://github.com/tyaglovsky/wiclip/releases/latest)
 
-- **Окно истории по горячей клавише** (по умолчанию `Ctrl+Shift+V`) — открывается у курсора.
-- **Текст, изображения и списки файлов** из буфера обмена.
-- **Поиск** по истории (просто начните печатать), быстрый выбор `Alt+1…9`.
-- **Закрепление** нужных записей — они не вытесняются и всегда сверху.
-- **Автовставка**: выбранная запись копируется в буфер и отправляется `Ctrl+V` в то окно,
-  которое было активным до вызова WiClip.
-- **Приватность**: буфер, помеченный менеджерами паролей (`Clipboard Viewer Ignore`,
-  `ExcludeClipboardContentFromMonitorProcessing`, `CanIncludeInClipboardHistory`),
-  в историю не попадает; отдельно есть чёрный список процессов.
-- **Тема** светлая/тёмная/как в системе, работает на нескольких мониторах с разным DPI.
-- **MSI-установщик** с тихой установкой, обновлением поверх и автозапуском.
+A clipboard manager for Windows 10 / 11 / Server 2016+. It sits in the tray, opens a
+window with your recent clips on a hotkey, and pastes the one you pick into whatever
+window you were working in.
 
-## Горячие клавиши в окне
+> The user interface is in Russian. English localisation is not implemented yet.
 
-| Клавиши | Действие |
+## Features
+
+- **History window on a hotkey** (`Ctrl+Shift+V` by default) — opens at the cursor.
+- **Text, images and file lists** captured from the clipboard.
+- **Search** — just start typing; quick pick with `Alt+1…9`.
+- **Pinned entries** stay at the top and are never evicted by the size limit.
+- **Auto-paste**: the selected entry goes to the clipboard and `Ctrl+V` is sent to the
+  window that was active before WiClip was opened.
+- **Privacy**: clipboard content flagged by password managers (`Clipboard Viewer Ignore`,
+  `ExcludeClipboardContentFromMonitorProcessing`, `CanIncludeInClipboardHistory`) is
+  never stored; there is also a per-process blocklist.
+- **Light / dark / system theme**, correct behaviour across monitors with different DPI.
+- **MSI installer** with silent install, in-place upgrades and autostart.
+
+## Keyboard and mouse
+
+| Input | Action |
 |---|---|
-| `Ctrl+Shift+V` | открыть окно (настраивается) |
-| одиночный клик | скопировать запись в буфер, окно остаётся открытым |
-| двойной клик | вставить в активное окно |
-| ↑ / ↓, PgUp / PgDn | перемещение по списку |
-| `Enter` | вставить в активное окно |
-| `Ctrl+Enter` | только скопировать в буфер, без вставки |
-| `Alt+1…9` | быстрый выбор записи по номеру |
-| `Ctrl+P` | закрепить / открепить |
-| `Shift+Delete` | удалить запись из истории |
-| `Esc` | закрыть окно |
+| `Ctrl+Shift+V` | open the window (configurable) |
+| single click | copy the entry, window stays open |
+| double click | paste into the active window |
+| ↑ / ↓, PgUp / PgDn | move through the list |
+| `Enter` | paste into the active window |
+| `Ctrl+Enter` | copy to the clipboard without pasting |
+| `Alt+1…9` | pick an entry by its number |
+| `Ctrl+P` | pin / unpin |
+| `Shift+Delete` | delete the entry from history |
+| `Esc` | close the window |
 
-Всё, что печатается, попадает в строку поиска.
+Anything else you type goes into the search box.
 
-## Сборка
+## Building
 
-Нужны **Windows**, **.NET SDK 8.0+** и **WiX 5**:
+You need **Windows**, **.NET SDK 8.0+** and **WiX 5**:
 
 ```powershell
 dotnet tool install --global wix --version 5.0.2
 ```
 
-Версию указывать обязательно: WiX 6 и новее требуют принять
-[Open Source Maintenance Fee EULA](https://wixtoolset.org/osmf/) и без этого падают
-с ошибкой `WIX7015`. Если версия 6/7 уже стоит — `dotnet tool uninstall --global wix`,
-затем команда выше.
+Pinning the version matters: WiX 6 and later require accepting the
+[Open Source Maintenance Fee EULA](https://wixtoolset.org/osmf/) and fail with `WIX7015`
+otherwise. If 6 or 7 is already installed, run `dotnet tool uninstall --global wix` first.
 
-Затем из корня репозитория:
+Then, from the repository root:
 
 ```powershell
 .\build.ps1
 ```
 
-Результат: `dist\WiClip-1.0.0-x64.msi` и папка `publish\x64` с готовым приложением.
+This produces `dist\WiClip-1.0.0-x64.msi` and a ready-to-run app in `publish\x64`.
 
-Полезные параметры:
+Useful parameters:
 
 ```powershell
 .\build.ps1 -Version 1.2.0 -Arch x64 -Culture ru-RU
 ```
 
-- `-SkipMsi` — собрать только exe, без установщика.
-- `build.ps1` должен оставаться в кодировке **UTF-8 с BOM**: Windows PowerShell 5.1 читает
-  скрипты без BOM как cp1251 и ломается на русских комментариях (`UnexpectedToken`).
-  Если редактор снял BOM — вернуть его можно так:
+- `-SkipMsi` — build the executable only, no installer.
+- `-Arch x86|arm64` — a different architecture.
+- `-Culture en-US` — installer UI language (the app itself is Russian-only).
+- `build.ps1` must stay **UTF-8 with BOM**: Windows PowerShell 5.1 reads BOM-less scripts
+  as cp1251 and chokes on the Russian comments (`UnexpectedToken`). To restore the BOM:
   `$p='.\build.ps1'; $t=[IO.File]::ReadAllText($p,[Text.Encoding]::UTF8); [IO.File]::WriteAllText($p,$t,(New-Object Text.UTF8Encoding $true))`.
-  В PowerShell 7 (`pwsh`) этой проблемы нет.
-- `-Arch x86|arm64` — другая разрядность.
-- `-Culture en-US` — язык интерфейса установщика (интерфейс самой программы всегда русский).
+  PowerShell 7 (`pwsh`) does not have this problem.
 
-Приложение публикуется **self-contained**: .NET Desktop Runtime на целевой машине
-не нужен, что удобно для серверов и закрытых контуров. Цена — размер MSI около 70–90 МБ.
-Если рантайм на машинах уже стоит, в `src/WiClip/WiClip.csproj` можно поставить
-`<SelfContained>false</SelfContained>` — пакет станет ~1 МБ.
+The app is published **self-contained**, so no .NET Desktop Runtime is required on the
+target machine — convenient for servers and locked-down environments. The price is an
+MSI of roughly 50–90 MB. If the runtime is already deployed, set
+`<SelfContained>false</SelfContained>` in `src/WiClip/WiClip.csproj` and the package
+drops to about 1 MB.
 
-## Установка
+## Installing
 
-Двойной клик по MSI — мастер сам спросит, ставить **для всех пользователей** или
-**только для меня**:
+Double-click the MSI — the wizard asks whether to install **for all users** or
+**for me only**:
 
-| Режим | Куда ставится | Права | Автозапуск |
+| Mode | Location | Rights | Autostart |
 |---|---|---|---|
-| Для всех пользователей | `C:\Program Files\WiClip` | нужен админ | `HKLM\...\Run` — у любого пользователя машины |
-| Только для меня | `%LocalAppData%\Programs\WiClip` | без админа | `HKCU\...\Run` — только у текущего |
+| All users | `C:\Program Files\WiClip` | administrator | `HKLM\...\Run` — every user of the machine |
+| Just me | `%LocalAppData%\Programs\WiClip` | no elevation | `HKCU\...\Run` — current user only |
 
-Тихая установка:
+Silent install:
 
 ```powershell
-# для всех пользователей (по умолчанию, нужны права администратора)
+# all users (default, requires administrator rights)
 msiexec /i WiClip-1.0.0-x64.msi /qn
 
-# только для текущего пользователя, без прав администратора
+# current user only, no elevation
 msiexec /i WiClip-1.0.0-x64.msi /qn MSIINSTALLPERUSER=1
 ```
 
-Полезные варианты:
+Other options:
 
 ```powershell
-# без автозапуска, но с ярлыком на рабочем столе
+# no autostart, but with a desktop shortcut
 msiexec /i WiClip-1.0.0-x64.msi /qn ADDLOCAL=Main,DesktopShortcutFeature
 
-# в свой каталог
+# custom directory
 msiexec /i WiClip-1.0.0-x64.msi /qn APPLICATIONFOLDER="D:\Apps\WiClip"
 
-# удаление
+# uninstall
 msiexec /x WiClip-1.0.0-x64.msi /qn
 ```
 
-Состав компонентов: `Main` (обязательный), `AutostartFeature` (автозапуск, включён
-по умолчанию), `DesktopShortcutFeature` (ярлык на рабочем столе, по умолчанию выключен).
+Features: `Main` (required), `AutostartFeature` (autostart, enabled by default),
+`DesktopShortcutFeature` (desktop shortcut, disabled by default).
 
-Обновление ставится поверх — предыдущая версия удаляется автоматически, запущенный
-экземпляр закрывается без перезагрузки.
+Upgrades install over the top — the previous version is removed automatically and a
+running instance is closed without a reboot.
 
-## Где лежат данные
+The installer is **not code-signed**, so Windows SmartScreen shows a warning on first
+run: choose "More info" → "Run anyway".
+
+## Where data lives
 
 `%APPDATA%\WiClip\`:
 
-- `settings.json` — настройки;
-- `history.json` — история;
-- `images\` — картинки из буфера;
-- `wiclip.log` — лог (обрезается по 512 КБ).
+- `settings.json` — settings;
+- `history.json` — the history itself;
+- `images\` — images captured from the clipboard;
+- `wiclip.log` — log, truncated at 512 KB.
 
-Удаление программы эти файлы не трогает — историю пользователей MSI не чистит.
-Чтобы вообще не писать историю на диск, снимите в настройках галочку
-«Сохранять историю между запусками»: файлы удаляются, история живёт только в памяти.
+Uninstalling does not remove these files — the MSI never touches user history. To keep
+history out of the filesystem entirely, clear "Сохранять историю между запусками"
+(*Keep history between sessions*) in the settings: the files are deleted and history
+lives in memory only.
 
-**Важно про безопасность:** история хранится в открытом виде, как и у встроенного
-`Win+V`. На общих и терминальных серверах учитывайте это — пароли, случайно попавшие
-в буфер, окажутся в файле. Помогают галочка «Не запоминать буфер менеджеров паролей»
-и режим «только в памяти».
+**Security note:** history is stored in plain text, exactly like the built-in `Win+V`
+history. On shared and terminal servers keep that in mind — a password that ends up in
+the clipboard ends up in the file. The "ignore password managers" option and the
+memory-only mode both help.
 
-## Автозапуск
+## Autostart
 
-- При первом запуске WiClip прописывает себя в автозапуск **текущего пользователя**
-  (`HKCU\...\Run`); отключается в настройках.
-- Опция установщика `AutostartAllUsersFeature` добавляет запись в `HKLM\...\Run` —
-  автозапуск для всех пользователей машины.
+- On first run WiClip registers itself for the **current user** (`HKCU\...\Run`); this can
+  be turned off in the settings.
+- The `AutostartFeature` installer component (enabled by default) writes to `HKLM\...\Run`
+  for an all-users install, or `HKCU\...\Run` for a per-user install. When the machine-wide
+  entry exists, the checkbox in the settings is shown as checked and locked, since removing
+  it needs administrator rights.
 
-## Известные ограничения
+## Known limitations
 
-- Вставка (`Ctrl+V`) не доходит до окон, запущенных **с правами администратора**,
-  если сам WiClip работает без них — так устроена изоляция уровней целостности Windows
-  (UIPI). Записи в буфер это не мешает: `Ctrl+V` можно нажать вручную.
-- Горячая клавиша может быть занята другой программой — WiClip покажет уведомление
-  в трее, сочетание меняется в настройках. `Win+V` занят системной историей Windows,
-  его брать нельзя.
-- Из буфера сохраняется простой текст; форматирование (RTF/HTML) при вставке теряется.
+- The simulated `Ctrl+V` does not reach windows running **elevated** while WiClip itself
+  is not — that is Windows integrity-level isolation (UIPI). Copying still works, so the
+  user can press `Ctrl+V` manually.
+- The hotkey may already be taken by another program — WiClip shows a tray notification
+  and the combination can be changed in the settings. `Win+V` belongs to the built-in
+  Windows clipboard history and cannot be used.
+- Only plain text is stored; RTF/HTML formatting is lost on paste.
 
-## Структура проекта
+## Project layout
 
 ```
 src/WiClip/
-  App.xaml(.cs)          старт, иконка в трее, единственный экземпляр
-  HistoryWindow.xaml     окно истории: поиск, список, вставка
-  SettingsWindow.xaml    настройки
-  ClipboardMonitor.cs    приём WM_CLIPBOARDUPDATE, фильтры приватности
-  HistoryStore.cs        история, дедупликация, лимит, сохранение
-  HotKeyManager.cs       глобальная горячая клавиша (RegisterHotKey)
-  Paster.cs              запись в буфер и отправка Ctrl+V в целевое окно
-  Native.cs              P/Invoke
+  App.xaml(.cs)          startup, tray icon, single-instance guard
+  HistoryWindow.xaml     history window: search, list, paste
+  SettingsWindow.xaml    settings dialog
+  ClipboardMonitor.cs    WM_CLIPBOARDUPDATE handling, privacy filters
+  HistoryStore.cs        history, deduplication, size limit, persistence
+  HotKeyManager.cs       global hotkey (RegisterHotKey)
+  Paster.cs              clipboard writes and Ctrl+V into the target window
+  Native.cs              P/Invoke declarations
 installer/
-  WiClip.wxs             описание MSI (WiX 5)
-  License.rtf            текст лицензии в установщике
-build.ps1                публикация + генерация списка файлов + сборка MSI
+  WiClip.wxs             MSI definition (WiX 5)
+  License.rtf            licence text shown by the installer
+build.ps1                publish + file-list generation + MSI build
 ```
+
+## Licence
+
+MIT.
