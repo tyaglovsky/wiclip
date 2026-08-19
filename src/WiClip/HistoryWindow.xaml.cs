@@ -257,13 +257,7 @@ public partial class HistoryWindow : Window
                 return;
 
             case Key.P when ctrl && !LibraryActive:
-                if (List.SelectedItem is ClipItem toPin)
-                {
-                    _store.TogglePin(toPin);
-                    _view.Refresh();
-                    List.SelectedItem = toPin;
-                    List.ScrollIntoView(toPin);
-                }
+                TogglePinSelected();
                 e.Handled = true;
                 return;
 
@@ -430,6 +424,84 @@ public partial class HistoryWindow : Window
     {
         if (LibraryList.SelectedItem is LibraryItem item)
             Use(item.ToPayload(), item.FilesPresent, paste: true);
+    }
+
+    /// <summary>Правый клик сначала выделяет запись под курсором — меню работает по ней.</summary>
+    private void Any_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is not ListBox list) return;
+        if (e.OriginalSource is not DependencyObject source) return;
+
+        if (ItemsControl.ContainerFromElement(list, source) is ListBoxItem container)
+            container.IsSelected = true;
+    }
+
+    private void List_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+    {
+        if (List.SelectedItem is not ClipItem item)
+        {
+            e.Handled = true;   // по пустому месту меню не показываем
+            return;
+        }
+
+        PinMenuItem.Header = item.Pinned ? Strings.MenuUnpin : Strings.MenuPin;
+
+        // Ставим флаг заранее: окно теряет фокус ещё до события Opened.
+        _modalOpen = true;
+    }
+
+    private void LibraryList_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+    {
+        if (LibraryList.SelectedItem is null)
+        {
+            e.Handled = true;
+            return;
+        }
+
+        _modalOpen = true;
+    }
+
+    // Пока открыто меню, окно не должно прятаться: это отдельное всплывающее окно.
+    private void Menu_Opened(object sender, RoutedEventArgs e) => _modalOpen = true;
+
+    private void Menu_Closed(object sender, RoutedEventArgs e)
+    {
+        _modalOpen = false;
+        Activate();
+    }
+
+    private void MenuPaste_Click(object sender, RoutedEventArgs e) => UseSelected(paste: true);
+
+    private void MenuCopy_Click(object sender, RoutedEventArgs e) => CopySelected();
+
+    private void MenuPin_Click(object sender, RoutedEventArgs e) => TogglePinSelected();
+
+    private void MenuToLibrary_Click(object sender, RoutedEventArgs e) => SaveSelectedToLibrary();
+
+    private void MenuDelete_Click(object sender, RoutedEventArgs e) => DeleteSelected();
+
+    private void MenuEdit_Click(object sender, RoutedEventArgs e) => EditSelectedLibraryItem();
+
+    private void CopySelected()
+    {
+        if (LibraryActive)
+        {
+            if (LibraryList.SelectedItem is LibraryItem item) CopyOnly(item.ToPayload(), item.FilesPresent);
+        }
+        else
+        {
+            if (List.SelectedItem is ClipItem item) CopyOnly(item.ToPayload(), available: true);
+        }
+    }
+
+    private void TogglePinSelected()
+    {
+        if (List.SelectedItem is not ClipItem item) return;
+
+        _store.TogglePin(item);
+        _view.Refresh();
+        List.SelectedItem = item;
+        List.ScrollIntoView(item);
     }
 
     private static object? ItemUnder(ListBox list, MouseButtonEventArgs e)

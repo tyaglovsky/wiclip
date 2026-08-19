@@ -9,8 +9,42 @@ namespace WiClip;
 /// </summary>
 public static class Strings
 {
-    private static readonly ResourceManager Manager =
-        new("WiClip.Resources.Strings", typeof(Strings).Assembly);
+    private const string PreferredBaseName = "WiClip.Resources.Strings";
+
+    private static readonly ResourceManager Manager = CreateManager();
+
+    /// <summary>
+    /// Ищем встроенный ресурс по факту, а не по угаданному имени: оно зависит от
+    /// RootNamespace и расположения файла, и при несовпадении весь интерфейс
+    /// показывал бы ключи вместо текста.
+    /// </summary>
+    private static ResourceManager CreateManager()
+    {
+        var assembly = typeof(Strings).Assembly;
+        try
+        {
+            var names = assembly.GetManifestResourceNames();
+            var match = Array.Find(names, n => n == PreferredBaseName + ".resources")
+                        ?? Array.Find(names, n => n.EndsWith("Strings.resources", StringComparison.Ordinal));
+
+            if (match is not null)
+            {
+                var baseName = match[..^".resources".Length];
+                if (baseName != PreferredBaseName)
+                    Log.Warn($"String resources found as '{baseName}', expected '{PreferredBaseName}'.");
+                return new ResourceManager(baseName, assembly);
+            }
+
+            Log.Error("Embedded string resources not found. Assembly contains: " +
+                      (names.Length == 0 ? "(nothing)" : string.Join(", ", names)));
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"Could not initialise string resources: {ex}");
+        }
+
+        return new ResourceManager(PreferredBaseName, assembly);
+    }
 
     private static bool _resourcesBroken;
 
@@ -278,6 +312,24 @@ public static class Strings
 
     /// <summary>Drop files here to add them to the library</summary>
     public static string DropHint => Get("DropHint");
+
+    /// <summary>Paste</summary>
+    public static string MenuPaste => Get("MenuPaste");
+
+    /// <summary>Copy</summary>
+    public static string MenuCopy => Get("MenuCopy");
+
+    /// <summary>Pin</summary>
+    public static string MenuPin => Get("MenuPin");
+
+    /// <summary>Unpin</summary>
+    public static string MenuUnpin => Get("MenuUnpin");
+
+    /// <summary>Delete</summary>
+    public static string MenuDelete => Get("MenuDelete");
+
+    /// <summary>Edit</summary>
+    public static string MenuEdit => Get("MenuEdit");
 
     /// <summary>No shortcut specified.</summary>
     public static string ErrHotKeyNotSet => Get("ErrHotKeyNotSet");

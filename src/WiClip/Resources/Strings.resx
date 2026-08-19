@@ -296,6 +296,24 @@
   <data name="DropHint" xml:space="preserve">
     <value>Drop files here to add them to the library</value>
   </data>
+  <data name="MenuPaste" xml:space="preserve">
+    <value>Paste</value>
+  </data>
+  <data name="MenuCopy" xml:space="preserve">
+    <value>Copy</value>
+  </data>
+  <data name="MenuPin" xml:space="preserve">
+    <value>Pin</value>
+  </data>
+  <data name="MenuUnpin" xml:space="preserve">
+    <value>Unpin</value>
+  </data>
+  <data name="MenuDelete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="MenuEdit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
   <data name="ErrHotKeyNotSet" xml:space="preserve">
     <value>No shortcut specified.</value>
   </data>

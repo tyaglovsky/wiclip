@@ -102,7 +102,26 @@
                              VirtualizingStackPanel.IsVirtualizing="True"
                              VirtualizingStackPanel.VirtualizationMode="Recycling"
                              PreviewMouseLeftButtonUp="List_PreviewMouseLeftButtonUp"
+                             PreviewMouseRightButtonDown="Any_PreviewMouseRightButtonDown"
+                             ContextMenuOpening="List_ContextMenuOpening"
                              MouseDoubleClick="List_MouseDoubleClick">
+                        <ListBox.ContextMenu>
+                            <ContextMenu Opened="Menu_Opened" Closed="Menu_Closed">
+                                <MenuItem Header="{x:Static local:Strings.MenuPaste}"
+                                          Click="MenuPaste_Click" FontWeight="SemiBold"/>
+                                <MenuItem Header="{x:Static local:Strings.MenuCopy}"
+                                          Click="MenuCopy_Click"/>
+                                <Separator/>
+                                <MenuItem x:Name="PinMenuItem"
+                                          Header="{x:Static local:Strings.MenuPin}"
+                                          Click="MenuPin_Click"/>
+                                <MenuItem Header="{x:Static local:Strings.SaveToLibrary}"
+                                          Click="MenuToLibrary_Click"/>
+                                <Separator/>
+                                <MenuItem Header="{x:Static local:Strings.MenuDelete}"
+                                          Click="MenuDelete_Click"/>
+                            </ContextMenu>
+                        </ListBox.ContextMenu>
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid>
@@ -212,7 +231,22 @@
                                  VirtualizingStackPanel.IsVirtualizing="True"
                                  VirtualizingStackPanel.VirtualizationMode="Recycling"
                                  PreviewMouseLeftButtonUp="LibraryList_PreviewMouseLeftButtonUp"
+                                 PreviewMouseRightButtonDown="Any_PreviewMouseRightButtonDown"
+                                 ContextMenuOpening="LibraryList_ContextMenuOpening"
                                  MouseDoubleClick="LibraryList_MouseDoubleClick">
+                            <ListBox.ContextMenu>
+                                <ContextMenu Opened="Menu_Opened" Closed="Menu_Closed">
+                                    <MenuItem Header="{x:Static local:Strings.MenuPaste}"
+                                              Click="MenuPaste_Click" FontWeight="SemiBold"/>
+                                    <MenuItem Header="{x:Static local:Strings.MenuCopy}"
+                                              Click="MenuCopy_Click"/>
+                                    <Separator/>
+                                    <MenuItem Header="{x:Static local:Strings.MenuEdit}"
+                                              Click="MenuEdit_Click"/>
+                                    <MenuItem Header="{x:Static local:Strings.MenuDelete}"
+                                              Click="MenuDelete_Click"/>
+                                </ContextMenu>
+                            </ListBox.ContextMenu>
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>
