@@ -5,13 +5,23 @@ using System.Windows.Media.Imaging;
 
 namespace WiClip;
 
+/// <summary>
+/// Что именно кладём в буфер. Общий вид для записи истории и записи библиотеки —
+/// у них разные хранилища, но одинаковый набор данных для Windows.
+/// </summary>
+public readonly record struct ClipboardPayload(
+    ClipKind Kind,
+    string Text,
+    string? ImagePath = null,
+    IReadOnlyList<string>? Files = null);
+
 /// <summary>Кладёт запись в буфер обмена и (по желанию) шлёт Ctrl+V в целевое окно.</summary>
 public static class Paster
 {
     private const int SW_RESTORE = 9;
 
     /// <summary>Положить запись в буфер обмена. Возвращает false при неудаче.</summary>
-    public static bool CopyToClipboard(ClipItem item)
+    public static bool CopyToClipboard(ClipboardPayload item)
     {
         for (var attempt = 0; attempt < 5; attempt++)
         {
@@ -20,7 +30,7 @@ public static class Paster
                 switch (item.Kind)
                 {
                     case ClipKind.Image:
-                        if (!File.Exists(item.ImagePath)) return false;
+                        if (item.ImagePath is null || !File.Exists(item.ImagePath)) return false;
                         var bmp = new BitmapImage();
                         bmp.BeginInit();
                         bmp.CacheOption = BitmapCacheOption.OnLoad;
@@ -31,11 +41,11 @@ public static class Paster
 
                     case ClipKind.Files:
                         var files = new StringCollection();
-                        foreach (var f in item.Text.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+                        foreach (var path in item.Files ?? Array.Empty<string>())
                         {
-                            var path = f.Trim();
-                            if (path.Length > 0) files.Add(path);
+                            if (File.Exists(path) || Directory.Exists(path)) files.Add(path);
                         }
+                        if (files.Count == 0) return false;
                         Clipboard.SetFileDropList(files);
                         break;
 

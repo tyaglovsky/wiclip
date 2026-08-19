@@ -15,6 +15,7 @@ public partial class App : Application
 
     private AppSettings _settings = null!;
     private HistoryStore _store = null!;
+    private LibraryStore _library = null!;
     private MessageWindow _msgWindow = null!;
     private ClipboardMonitor _monitor = null!;
     private HotKeyManager _hotKeys = null!;
@@ -78,6 +79,7 @@ public partial class App : Application
         }
 
         _store = new HistoryStore(_settings);
+        _library = new LibraryStore();
 
         _msgWindow = new MessageWindow();
         _msgWindow.MessageReceived += OnMessage;
@@ -182,7 +184,7 @@ public partial class App : Application
         {
             if (_window is null)
             {
-                _window = new HistoryWindow(_store, _settings, _monitor);
+                _window = new HistoryWindow(_store, _library, _settings, _monitor);
                 _window.SettingsRequested += ShowSettings;
             }
 
@@ -249,6 +251,7 @@ public partial class App : Application
     protected override void OnExit(ExitEventArgs e)
     {
         _store?.Save();
+        _library?.Save();
         _hotKeys?.Dispose();
         _monitor?.Dispose();
         _msgWindow?.Dispose();

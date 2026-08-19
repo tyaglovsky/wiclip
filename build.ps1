@@ -14,7 +14,7 @@
 #>
 [CmdletBinding()]
 param(
-    [string]$Version = "1.0.1",
+    [string]$Version = "1.1.0",
     [ValidateSet("x64", "x86", "arm64")]
     [string]$Arch = "x64",
     [string]$Configuration = "Release",

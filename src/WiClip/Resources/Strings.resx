@@ -101,7 +101,7 @@
     <value>Nothing found.</value>
   </data>
   <data name="Hints" xml:space="preserve">
-    <value>Click - copy · Double click or Enter - paste · Alt+1...9 - quick pick · Ctrl+P - pin · Shift+Delete - remove · Esc - close</value>
+    <value>Click - copy · Enter - paste · Alt+1...9 - quick pick · Ctrl+P - pin · Ctrl+S - to library · Shift+Delete - remove · Tab - switch tab</value>
   </data>
   <data name="ToastCopied" xml:space="preserve">
     <value>✓ Copied to clipboard</value>
@@ -198,6 +198,104 @@
   <data name="LanguageRestartNote" xml:space="preserve">
     <value>The language applies to windows opened from now on.</value>
   </data>
+  <data name="TabHistory" xml:space="preserve">
+    <value>History</value>
+  </data>
+  <data name="TabLibrary" xml:space="preserve">
+    <value>Library</value>
+  </data>
+  <data name="LibraryEmpty" xml:space="preserve">
+    <value>The library is empty. Add text or files - they stay here until you delete them.</value>
+  </data>
+  <data name="LibraryHints" xml:space="preserve">
+    <value>Click - copy · Enter - paste · Alt+1...9 - quick pick · F2 - edit · Shift+Delete - remove · Tab - switch tab</value>
+  </data>
+  <data name="ButtonAddText" xml:space="preserve">
+    <value>+ Text</value>
+  </data>
+  <data name="ButtonAddFile" xml:space="preserve">
+    <value>+ File</value>
+  </data>
+  <data name="ButtonAddFolder" xml:space="preserve">
+    <value>+ Folder</value>
+  </data>
+  <data name="FolderAll" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="FolderDefault" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="FolderNew" xml:space="preserve">
+    <value>New folder</value>
+  </data>
+  <data name="SaveToLibrary" xml:space="preserve">
+    <value>Save to library (Ctrl+S)</value>
+  </data>
+  <data name="ToastSavedToLibrary" xml:space="preserve">
+    <value>✓ Saved to the library</value>
+  </data>
+  <data name="EditorTitleNew" xml:space="preserve">
+    <value>New entry</value>
+  </data>
+  <data name="EditorTitleEdit" xml:space="preserve">
+    <value>Edit entry</value>
+  </data>
+  <data name="LabelName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="LabelText" xml:space="preserve">
+    <value>Text</value>
+  </data>
+  <data name="LabelFolder" xml:space="preserve">
+    <value>Folder</value>
+  </data>
+  <data name="HintNameOptional" xml:space="preserve">
+    <value>Leave empty to use the beginning of the text</value>
+  </data>
+  <data name="PickFilesTitle" xml:space="preserve">
+    <value>Add files to the library</value>
+  </data>
+  <data name="ConfirmDeleteFolder" xml:space="preserve">
+    <value>Delete the folder "{0}" together with all its entries?</value>
+    <comment>{0} = folder name</comment>
+  </data>
+  <data name="ConfirmDeleteItem" xml:space="preserve">
+    <value>Delete "{0}" from the library?</value>
+    <comment>{0} = entry name</comment>
+  </data>
+  <data name="TooltipPin" xml:space="preserve">
+    <value>Keep the window open</value>
+  </data>
+  <data name="TooltipAddText" xml:space="preserve">
+    <value>Add a text entry</value>
+  </data>
+  <data name="TooltipAddFile" xml:space="preserve">
+    <value>Copy files into the library</value>
+  </data>
+  <data name="TooltipAddFolder" xml:space="preserve">
+    <value>Create a folder</value>
+  </data>
+  <data name="TooltipRenameFolder" xml:space="preserve">
+    <value>Rename the folder (F2)</value>
+  </data>
+  <data name="TooltipDeleteFolder" xml:space="preserve">
+    <value>Delete the folder</value>
+  </data>
+  <data name="MetaFiles" xml:space="preserve">
+    <value>{0} files</value>
+  </data>
+  <data name="MetaFile" xml:space="preserve">
+    <value>file</value>
+  </data>
+  <data name="MetaText" xml:space="preserve">
+    <value>text</value>
+  </data>
+  <data name="MetaImage" xml:space="preserve">
+    <value>image</value>
+  </data>
+  <data name="DropHint" xml:space="preserve">
+    <value>Drop files here to add them to the library</value>
+  </data>
   <data name="ErrHotKeyNotSet" xml:space="preserve">
     <value>No shortcut specified.</value>
   </data>
@@ -221,5 +319,19 @@
   </data>
   <data name="ErrMaxItems" xml:space="preserve">
     <value>The number of entries must be between 1 and 10000.</value>
+  </data>
+  <data name="ErrEmptyEntry" xml:space="preserve">
+    <value>Enter some text or pick a file.</value>
+  </data>
+  <data name="ErrFileTooBig" xml:space="preserve">
+    <value>"{0}" is larger than {1} MB and was not added.</value>
+    <comment>{0} = file name, {1} = limit</comment>
+  </data>
+  <data name="ErrCopyFile" xml:space="preserve">
+    <value>Could not copy "{0}": {1}</value>
+    <comment>{0} = file, {1} = reason</comment>
+  </data>
+  <data name="ErrFileMissing" xml:space="preserve">
+    <value>The stored file is missing.</value>
   </data>
 </root>

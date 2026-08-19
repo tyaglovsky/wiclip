@@ -101,6 +101,18 @@ public sealed class ClipItem : INotifyPropertyChanged
         }
     }
 
+    /// <summary>Данные для буфера обмена: у истории картинки лежат в своей папке.</summary>
+    public ClipboardPayload ToPayload() => Kind switch
+    {
+        ClipKind.Image => new ClipboardPayload(Kind, Text, ImagePath),
+        ClipKind.Files => new ClipboardPayload(Kind, Text,
+            Files: Text.Split('\n', StringSplitOptions.RemoveEmptyEntries)
+                       .Select(f => f.Trim())
+                       .Where(f => f.Length > 0)
+                       .ToArray()),
+        _ => new ClipboardPayload(Kind, Text)
+    };
+
     public bool Matches(string query)
     {
         if (string.IsNullOrWhiteSpace(query)) return true;

@@ -24,6 +24,8 @@ can be pinned to either one in the settings.
   never stored; there is also a per-process blocklist.
 - **Light / dark / system theme**, correct behaviour across monitors with different DPI.
 - **English and Russian UI**, picked from the system language or set explicitly.
+- **Library**: a second tab with entries you save yourself — text snippets and files that
+  never expire, organised in folders.
 - **MSI installer** with silent install, in-place upgrades and autostart.
 
 ## Keyboard and mouse
@@ -39,9 +41,28 @@ can be pinned to either one in the settings.
 | `Alt+1…9` | pick an entry by its number |
 | `Ctrl+P` | pin / unpin |
 | `Shift+Delete` | delete the entry from history |
+| `Tab` | switch between History and Library |
+| `Ctrl+S` | save the selected clip to the library |
+| `F2` | edit a library entry (name, text, folder) |
 | `Esc` | close the window |
 
 Anything else you type goes into the search box.
+
+## Library
+
+The history is a rolling buffer — old entries are pushed out. The **Library** tab holds
+what you save deliberately: it never expires and survives restarts.
+
+- **Folders** on the left, "All" shows everything.
+- **`+ Text`** creates a named snippet, **`+ File`** copies files in, or simply **drag files
+  onto the window**.
+- **`Ctrl+S`** on the History tab moves the selected clip into the library.
+- Files are **copied** into `%APPDATA%\WiClip\library\`, so moving or deleting the original
+  changes nothing. Pasting gives real files — into Explorer, a mail client, a messenger.
+  Anything above 100 MB is refused.
+- **`F2`** edits the name, text and folder; **`Shift+Delete`** removes an entry.
+- The **📌** button in the header keeps the window open — needed for drag & drop, since the
+  window otherwise hides as soon as you click another program.
 
 ## Building
 
@@ -61,7 +82,7 @@ Then, from the repository root:
 .\build.ps1
 ```
 
-This produces `dist\WiClip-1.0.1-x64.msi` and a ready-to-run app in `publish\x64`.
+This produces `dist\WiClip-1.1.0-x64.msi` and a ready-to-run app in `publish\x64`.
 
 Useful parameters:
 
@@ -98,23 +119,23 @@ Silent install:
 
 ```powershell
 # all users (default, requires administrator rights)
-msiexec /i WiClip-1.0.1-x64.msi /qn
+msiexec /i WiClip-1.1.0-x64.msi /qn
 
 # current user only, no elevation
-msiexec /i WiClip-1.0.1-x64.msi /qn MSIINSTALLPERUSER=1
+msiexec /i WiClip-1.1.0-x64.msi /qn MSIINSTALLPERUSER=1
 ```
 
 Other options:
 
 ```powershell
 # no autostart, but with a desktop shortcut
-msiexec /i WiClip-1.0.1-x64.msi /qn ADDLOCAL=Main,DesktopShortcutFeature
+msiexec /i WiClip-1.1.0-x64.msi /qn ADDLOCAL=Main,DesktopShortcutFeature
 
 # custom directory
-msiexec /i WiClip-1.0.1-x64.msi /qn APPLICATIONFOLDER="D:\Apps\WiClip"
+msiexec /i WiClip-1.1.0-x64.msi /qn APPLICATIONFOLDER="D:\Apps\WiClip"
 
 # uninstall
-msiexec /x WiClip-1.0.1-x64.msi /qn
+msiexec /x WiClip-1.1.0-x64.msi /qn
 ```
 
 Features: `Main` (required), `AutostartFeature` (autostart, enabled by default),
@@ -133,6 +154,7 @@ run: choose "More info" → "Run anyway".
 - `settings.json` — settings;
 - `history.json` — the history itself;
 - `images\` — images captured from the clipboard;
+- `library.json` and `library\` — the library and its copied files;
 - `wiclip.log` — log, truncated at 512 KB.
 
 Uninstalling does not remove these files — the MSI never touches user history. To keep
@@ -191,6 +213,9 @@ src/WiClip/
   SettingsWindow.xaml    settings dialog
   ClipboardMonitor.cs    WM_CLIPBOARDUPDATE handling, privacy filters
   HistoryStore.cs        history, deduplication, size limit, persistence
+  LibraryStore.cs        library: folders, entries, copied files
+  LibraryItem.cs         library entry and folder models
+  ItemEditorWindow.xaml  create / edit a library entry
   HotKeyManager.cs       global hotkey (RegisterHotKey)
   Paster.cs              clipboard writes and Ctrl+V into the target window
   Native.cs              P/Invoke declarations

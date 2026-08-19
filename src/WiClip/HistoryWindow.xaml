@@ -3,13 +3,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:WiClip"
         Title="WiClip"
-        Width="460" Height="560"
+        Width="560" Height="600"
         WindowStyle="None"
         ResizeMode="NoResize"
         AllowsTransparency="True"
         Background="Transparent"
         ShowInTaskbar="False"
         Topmost="True"
+        AllowDrop="True"
+        Drop="Window_Drop"
+        DragOver="Window_DragOver"
+        DragLeave="Window_DragLeave"
         UseLayoutRounding="True"
         TextOptions.TextFormattingMode="Display">
 
@@ -33,17 +37,23 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <!-- Заголовок -->
-            <Grid Grid.Row="0" Margin="2,0,2,8">
+            <Grid Grid.Row="0" Margin="2,0,2,4">
                 <TextBlock Text="{x:Static local:Strings.WindowTitle}"
                            FontSize="13" FontWeight="SemiBold"
                            Foreground="{DynamicResource TextBrush}"
                            VerticalAlignment="Center"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <ToggleButton x:Name="PinButton" Content="📌" FontSize="12"
+                                  Background="Transparent" BorderThickness="0"
+                                  Foreground="{DynamicResource TextDimBrush}"
+                                  Padding="6,2" Cursor="Hand"
+                                  ToolTip="{x:Static local:Strings.TooltipPin}"/>
                     <Button x:Name="SettingsButton" Style="{StaticResource FlatButton}"
                             Content="⚙" FontSize="14"
                             ToolTip="{x:Static local:Strings.TooltipSettings}"
@@ -55,8 +65,20 @@
                 </StackPanel>
             </Grid>
 
+            <!-- Вкладки -->
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,6">
+                <RadioButton x:Name="HistoryTab" Style="{StaticResource TabButton}"
+                             GroupName="Tabs" IsChecked="True"
+                             Content="{x:Static local:Strings.TabHistory}"
+                             Checked="Tab_Changed"/>
+                <RadioButton x:Name="LibraryTab" Style="{StaticResource TabButton}"
+                             GroupName="Tabs"
+                             Content="{x:Static local:Strings.TabLibrary}"
+                             Checked="Tab_Changed"/>
+            </StackPanel>
+
             <!-- Поиск -->
-            <Grid Grid.Row="1">
+            <Grid Grid.Row="2">
                 <TextBox x:Name="SearchBox"
                          Style="{StaticResource SearchBox}"
                          TextChanged="SearchBox_TextChanged"/>
@@ -66,68 +88,182 @@
                            VerticalAlignment="Center" IsHitTestVisible="False"/>
             </Grid>
 
-            <!-- Список -->
-            <Grid Grid.Row="2" Margin="0,8,0,0">
-                <ListBox x:Name="List"
-                         Background="Transparent"
-                         BorderThickness="0"
-                         AlternationCount="1000"
-                         ItemContainerStyle="{StaticResource ClipItemStyle}"
-                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                         VirtualizingStackPanel.IsVirtualizing="True"
-                         VirtualizingStackPanel.VirtualizationMode="Recycling"
-                         PreviewMouseLeftButtonUp="List_PreviewMouseLeftButtonUp"
-                         MouseDoubleClick="List_MouseDoubleClick">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="22"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
+            <!-- Содержимое -->
+            <Grid Grid.Row="3" Margin="0,8,0,0">
 
-                                <!-- Номер для Alt+1…9 -->
-                                <TextBlock Grid.Column="0"
-                                           Text="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem},
-                                                          Path=(ItemsControl.AlternationIndex),
-                                                          Converter={StaticResource IndexToBadge}}"
-                                           Foreground="{DynamicResource TextDimBrush}"
-                                           FontSize="11" VerticalAlignment="Center"/>
+                <!-- Вкладка «История» -->
+                <Grid x:Name="HistoryPanel">
+                    <ListBox x:Name="List"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             AlternationCount="1000"
+                             ItemContainerStyle="{StaticResource ClipItemStyle}"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             VirtualizingStackPanel.IsVirtualizing="True"
+                             VirtualizingStackPanel.VirtualizationMode="Recycling"
+                             PreviewMouseLeftButtonUp="List_PreviewMouseLeftButtonUp"
+                             MouseDoubleClick="List_MouseDoubleClick">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="22"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <StackPanel Grid.Column="1">
-                                    <TextBlock Text="{Binding Preview}"
-                                               TextTrimming="CharacterEllipsis"
-                                               Visibility="{Binding Thumbnail, Converter={StaticResource NotNullToCollapsed}}"
-                                               FontSize="13"/>
-                                    <Image Source="{Binding Thumbnail}"
-                                           Visibility="{Binding Thumbnail, Converter={StaticResource NullToCollapsed}}"
-                                           MaxHeight="64" HorizontalAlignment="Left"
-                                           Stretch="Uniform" Margin="0,2"/>
-                                    <TextBlock Text="{Binding Meta}"
+                                    <TextBlock Grid.Column="0"
+                                               Text="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem},
+                                                              Path=(ItemsControl.AlternationIndex),
+                                                              Converter={StaticResource IndexToBadge}}"
                                                Foreground="{DynamicResource TextDimBrush}"
-                                               FontSize="11" Margin="0,2,0,0"
-                                               TextTrimming="CharacterEllipsis"/>
-                                </StackPanel>
+                                               FontSize="11" VerticalAlignment="Center"/>
 
-                                <TextBlock Grid.Column="2" Text="📌"
-                                           FontSize="12" VerticalAlignment="Top" Margin="6,0,0,0"
-                                           Visibility="{Binding Pinned, Converter={StaticResource BoolToVis}}"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="{Binding Preview}"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   Visibility="{Binding Thumbnail, Converter={StaticResource NotNullToCollapsed}}"
+                                                   FontSize="13"/>
+                                        <Image Source="{Binding Thumbnail}"
+                                               Visibility="{Binding Thumbnail, Converter={StaticResource NullToCollapsed}}"
+                                               MaxHeight="64" HorizontalAlignment="Left"
+                                               Stretch="Uniform" Margin="0,2"/>
+                                        <TextBlock Text="{Binding Meta}"
+                                                   Foreground="{DynamicResource TextDimBrush}"
+                                                   FontSize="11" Margin="0,2,0,0"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
 
-                <TextBlock x:Name="EmptyHint"
-                           Text="{x:Static local:Strings.EmptyHistory}"
-                           Foreground="{DynamicResource TextDimBrush}"
-                           TextWrapping="Wrap" TextAlignment="Center"
-                           VerticalAlignment="Center" Margin="20"
-                           Visibility="Collapsed"/>
+                                    <TextBlock Grid.Column="2" Text="📌"
+                                               FontSize="12" VerticalAlignment="Top" Margin="6,0,0,0"
+                                               Visibility="{Binding Pinned, Converter={StaticResource BoolToVis}}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <TextBlock x:Name="EmptyHint"
+                               Text="{x:Static local:Strings.EmptyHistory}"
+                               Foreground="{DynamicResource TextDimBrush}"
+                               TextWrapping="Wrap" TextAlignment="Center"
+                               VerticalAlignment="Center" Margin="20"
+                               Visibility="Collapsed"/>
+                </Grid>
+
+                <!-- Вкладка «Библиотека» -->
+                <Grid x:Name="LibraryPanel" Visibility="Collapsed">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Папки -->
+                    <Grid Grid.Column="0" Margin="0,0,8,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <ListBox x:Name="FolderList" Grid.Row="0"
+                                 Background="Transparent" BorderThickness="0"
+                                 ItemContainerStyle="{StaticResource ClipItemStyle}"
+                                 DisplayMemberPath="Name"
+                                 SelectionChanged="FolderList_SelectionChanged"/>
+
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,6,0,0">
+                            <Button x:Name="AddFolderButton" Style="{StaticResource SmallButton}"
+                                    Content="{x:Static local:Strings.ButtonAddFolder}"
+                                    ToolTip="{x:Static local:Strings.TooltipAddFolder}"
+                                    Click="AddFolder_Click"/>
+                            <Button x:Name="RenameFolderButton" Style="{StaticResource SmallButton}"
+                                    Content="✎" Margin="4,0,0,0"
+                                    ToolTip="{x:Static local:Strings.TooltipRenameFolder}"
+                                    Click="RenameFolder_Click"/>
+                            <Button x:Name="DeleteFolderButton" Style="{StaticResource SmallButton}"
+                                    Content="🗑" Margin="4,0,0,0"
+                                    ToolTip="{x:Static local:Strings.TooltipDeleteFolder}"
+                                    Click="DeleteFolder_Click"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Записи библиотеки -->
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,6">
+                            <Button x:Name="AddTextButton" Style="{StaticResource SmallButton}"
+                                    Content="{x:Static local:Strings.ButtonAddText}"
+                                    ToolTip="{x:Static local:Strings.TooltipAddText}"
+                                    Click="AddText_Click"/>
+                            <Button x:Name="AddFileButton" Style="{StaticResource SmallButton}"
+                                    Content="{x:Static local:Strings.ButtonAddFile}" Margin="4,0,0,0"
+                                    ToolTip="{x:Static local:Strings.TooltipAddFile}"
+                                    Click="AddFile_Click"/>
+                        </StackPanel>
+
+                        <ListBox x:Name="LibraryList" Grid.Row="1"
+                                 Background="Transparent" BorderThickness="0"
+                                 AlternationCount="1000"
+                                 ItemContainerStyle="{StaticResource ClipItemStyle}"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 VirtualizingStackPanel.IsVirtualizing="True"
+                                 VirtualizingStackPanel.VirtualizationMode="Recycling"
+                                 PreviewMouseLeftButtonUp="LibraryList_PreviewMouseLeftButtonUp"
+                                 MouseDoubleClick="LibraryList_MouseDoubleClick">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="22"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0"
+                                                   Text="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem},
+                                                                  Path=(ItemsControl.AlternationIndex),
+                                                                  Converter={StaticResource IndexToBadge}}"
+                                                   Foreground="{DynamicResource TextDimBrush}"
+                                                   FontSize="11" VerticalAlignment="Center"/>
+
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="{Binding Display}"
+                                                       TextTrimming="CharacterEllipsis" FontSize="13"/>
+                                            <TextBlock Text="{Binding Meta}"
+                                                       Foreground="{DynamicResource TextDimBrush}"
+                                                       FontSize="11" Margin="0,2,0,0"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <TextBlock x:Name="LibraryEmptyHint" Grid.Row="1"
+                                   Text="{x:Static local:Strings.LibraryEmpty}"
+                                   Foreground="{DynamicResource TextDimBrush}"
+                                   TextWrapping="Wrap" TextAlignment="Center"
+                                   VerticalAlignment="Center" Margin="20"
+                                   Visibility="Collapsed"/>
+                    </Grid>
+                </Grid>
+
+                <!-- Подсветка при перетаскивании файлов -->
+                <Border x:Name="DropOverlay" Visibility="Collapsed"
+                        Background="{DynamicResource BgBrush}" Opacity="0.94"
+                        BorderBrush="{DynamicResource AccentBrush}" BorderThickness="2"
+                        CornerRadius="8">
+                    <TextBlock Text="{x:Static local:Strings.DropHint}"
+                               Foreground="{DynamicResource TextBrush}"
+                               FontSize="14" TextWrapping="Wrap" TextAlignment="Center"
+                               VerticalAlignment="Center" Margin="24"/>
+                </Border>
             </Grid>
 
-            <!-- Подсказки и уведомление о копировании -->
-            <Grid Grid.Row="3" Margin="4,8,4,0">
+            <!-- Подсказки и уведомление -->
+            <Grid Grid.Row="4" Margin="4,8,4,0">
                 <TextBlock x:Name="HintText"
                            Foreground="{DynamicResource TextDimBrush}"
                            FontSize="11" TextWrapping="Wrap"

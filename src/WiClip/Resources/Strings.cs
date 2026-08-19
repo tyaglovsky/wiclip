@@ -87,7 +87,7 @@ public static class Strings
     /// <summary>Nothing found.</summary>
     public static string EmptySearch => Get("EmptySearch");
 
-    /// <summary>Click - copy · Double click or Enter - paste · Alt+1...9 - quick pick · Ctrl+P - pin · Shift+Delete - remove · Esc - close</summary>
+    /// <summary>Click - copy · Enter - paste · Alt+1...9 - quick pick · Ctrl+P - pin · Ctrl+S - to library · Shift+Delete - remove · Tab - switch tab</summary>
     public static string Hints => Get("Hints");
 
     /// <summary>✓ Copied to clipboard</summary>
@@ -183,6 +183,102 @@ public static class Strings
     /// <summary>The language applies to windows opened from now on.</summary>
     public static string LanguageRestartNote => Get("LanguageRestartNote");
 
+    /// <summary>History</summary>
+    public static string TabHistory => Get("TabHistory");
+
+    /// <summary>Library</summary>
+    public static string TabLibrary => Get("TabLibrary");
+
+    /// <summary>The library is empty. Add text or files - they stay here until you delete them.</summary>
+    public static string LibraryEmpty => Get("LibraryEmpty");
+
+    /// <summary>Click - copy · Enter - paste · Alt+1...9 - quick pick · F2 - edit · Shift+Delete - remove · Tab - switch tab</summary>
+    public static string LibraryHints => Get("LibraryHints");
+
+    /// <summary>+ Text</summary>
+    public static string ButtonAddText => Get("ButtonAddText");
+
+    /// <summary>+ File</summary>
+    public static string ButtonAddFile => Get("ButtonAddFile");
+
+    /// <summary>+ Folder</summary>
+    public static string ButtonAddFolder => Get("ButtonAddFolder");
+
+    /// <summary>All</summary>
+    public static string FolderAll => Get("FolderAll");
+
+    /// <summary>General</summary>
+    public static string FolderDefault => Get("FolderDefault");
+
+    /// <summary>New folder</summary>
+    public static string FolderNew => Get("FolderNew");
+
+    /// <summary>Save to library (Ctrl+S)</summary>
+    public static string SaveToLibrary => Get("SaveToLibrary");
+
+    /// <summary>✓ Saved to the library</summary>
+    public static string ToastSavedToLibrary => Get("ToastSavedToLibrary");
+
+    /// <summary>New entry</summary>
+    public static string EditorTitleNew => Get("EditorTitleNew");
+
+    /// <summary>Edit entry</summary>
+    public static string EditorTitleEdit => Get("EditorTitleEdit");
+
+    /// <summary>Name</summary>
+    public static string LabelName => Get("LabelName");
+
+    /// <summary>Text</summary>
+    public static string LabelText => Get("LabelText");
+
+    /// <summary>Folder</summary>
+    public static string LabelFolder => Get("LabelFolder");
+
+    /// <summary>Leave empty to use the beginning of the text</summary>
+    public static string HintNameOptional => Get("HintNameOptional");
+
+    /// <summary>Add files to the library</summary>
+    public static string PickFilesTitle => Get("PickFilesTitle");
+
+    /// <summary>Delete the folder "{0}" together with all its entries?</summary>
+    public static string ConfirmDeleteFolder => Get("ConfirmDeleteFolder");
+
+    /// <summary>Delete "{0}" from the library?</summary>
+    public static string ConfirmDeleteItem => Get("ConfirmDeleteItem");
+
+    /// <summary>Keep the window open</summary>
+    public static string TooltipPin => Get("TooltipPin");
+
+    /// <summary>Add a text entry</summary>
+    public static string TooltipAddText => Get("TooltipAddText");
+
+    /// <summary>Copy files into the library</summary>
+    public static string TooltipAddFile => Get("TooltipAddFile");
+
+    /// <summary>Create a folder</summary>
+    public static string TooltipAddFolder => Get("TooltipAddFolder");
+
+    /// <summary>Rename the folder (F2)</summary>
+    public static string TooltipRenameFolder => Get("TooltipRenameFolder");
+
+    /// <summary>Delete the folder</summary>
+    public static string TooltipDeleteFolder => Get("TooltipDeleteFolder");
+
+    /// <summary>{0} files</summary>
+    public static string MetaFiles => Get("MetaFiles");
+
+    /// <summary>file</summary>
+    public static string MetaFile => Get("MetaFile");
+
+    /// <summary>text</summary>
+    public static string MetaText => Get("MetaText");
+
+    /// <summary>image</summary>
+    public static string MetaImage => Get("MetaImage");
+
+    /// <summary>Drop files here to add them to the library</summary>
+    public static string DropHint => Get("DropHint");
+
     /// <summary>No shortcut specified.</summary>
     public static string ErrHotKeyNotSet => Get("ErrHotKeyNotSet");
 
@@ -206,4 +302,16 @@ public static class Strings
 
     /// <summary>The number of entries must be between 1 and 10000.</summary>
     public static string ErrMaxItems => Get("ErrMaxItems");
+
+    /// <summary>Enter some text or pick a file.</summary>
+    public static string ErrEmptyEntry => Get("ErrEmptyEntry");
+
+    /// <summary>"{0}" is larger than {1} MB and was not added.</summary>
+    public static string ErrFileTooBig => Get("ErrFileTooBig");
+
+    /// <summary>Could not copy "{0}": {1}</summary>
+    public static string ErrCopyFile => Get("ErrCopyFile");
+
+    /// <summary>The stored file is missing.</summary>
+    public static string ErrFileMissing => Get("ErrFileMissing");
 }

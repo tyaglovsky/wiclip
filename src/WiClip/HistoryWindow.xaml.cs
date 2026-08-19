@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -11,18 +12,25 @@ namespace WiClip;
 public partial class HistoryWindow : Window
 {
     private readonly HistoryStore _store;
+    private readonly LibraryStore _library;
     private readonly AppSettings _settings;
     private readonly ClipboardMonitor _monitor;
-    private readonly ICollectionView _view;
 
+    private readonly ICollectionView _view;
+    private readonly ICollectionView _libraryView;
     private readonly DispatcherTimer _toastTimer;
 
     private IntPtr _target;
     private bool _reallyClose;
 
-    public HistoryWindow(HistoryStore store, AppSettings settings, ClipboardMonitor monitor)
+    /// <summary>Пока открыт диалог, окно не должно прятаться по потере фокуса.</summary>
+    private bool _modalOpen;
+
+    public HistoryWindow(HistoryStore store, LibraryStore library,
+                         AppSettings settings, ClipboardMonitor monitor)
     {
         _store = store;
+        _library = library;
         _settings = settings;
         _monitor = monitor;
 
@@ -32,6 +40,13 @@ public partial class HistoryWindow : Window
         _view.Filter = o => o is ClipItem item && item.Matches(SearchBox.Text);
         List.ItemsSource = _view;
 
+        _libraryView = CollectionViewSource.GetDefaultView(_library.Items);
+        _libraryView.Filter = o => o is LibraryItem item && InCurrentFolder(item) && item.Matches(SearchBox.Text);
+        LibraryList.ItemsSource = _libraryView;
+
+        FolderList.ItemsSource = _library.Folders;
+        FolderList.SelectedIndex = 0;
+
         _toastTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
         _toastTimer.Tick += (_, _) =>
         {
@@ -40,10 +55,27 @@ public partial class HistoryWindow : Window
             HintText.Visibility = Visibility.Visible;
         };
 
-        // Клик мимо окна прячет его — как у системного Win+V.
-        Deactivated += (_, _) => HideWindow();
+        // Клик мимо окна прячет его — если окно не закреплено и не открыт диалог.
+        Deactivated += (_, _) =>
+        {
+            if (!_modalOpen && PinButton.IsChecked != true) HideWindow();
+        };
         PreviewKeyDown += OnPreviewKeyDown;
     }
+
+    private bool LibraryActive => LibraryTab.IsChecked == true;
+
+    private ListBox ActiveList => LibraryActive ? LibraryList : List;
+
+    private ICollectionView ActiveView => LibraryActive ? _libraryView : _view;
+
+    private string CurrentFolderId =>
+        FolderList.SelectedItem is LibraryFolder folder ? folder.Id : string.Empty;
+
+    private bool InCurrentFolder(LibraryItem item) =>
+        CurrentFolderId.Length == 0 || item.FolderId == CurrentFolderId;
+
+    // ------------------------------------------------------------ показ ---
 
     /// <summary>Показать окно у курсора; target — окно, куда потом вставлять.</summary>
     public void ShowFor(IntPtr target)
@@ -51,8 +83,10 @@ public partial class HistoryWindow : Window
         _target = target;
 
         SearchBox.Text = string.Empty;
+        // Псевдопапка «Все» переводится на лету: сам список папок не пересоздаётся.
+        if (_library.Folders.Count > 0) _library.Folders[0].Name = Strings.FolderAll;
         foreach (var item in _store.Items) item.RefreshMeta();
-        _view.Refresh();
+        ActiveView.Refresh();
 
         Opacity = 0;
         Show();
@@ -62,11 +96,11 @@ public partial class HistoryWindow : Window
         Activate();
         SearchBox.Focus();
 
-        if (List.Items.Count > 0) List.SelectedIndex = 0;
+        if (ActiveList.Items.Count > 0) ActiveList.SelectedIndex = 0;
         UpdateEmptyState();
 
         Log.Info($"History window opened: {_store.Items.Count} entries in history, " +
-                 $"{List.Items.Count} shown.");
+                 $"{_library.Items.Count} in the library.");
     }
 
     private void PositionNearCursor()
@@ -112,21 +146,66 @@ public partial class HistoryWindow : Window
         SearchBox.Text = string.Empty;
     }
 
+    // ------------------------------------------------------------ вкладки ---
+
+    private void Tab_Changed(object sender, RoutedEventArgs e)
+    {
+        // Событие приходит и при построении окна, когда панелей ещё нет.
+        if (HistoryPanel is null || LibraryPanel is null) return;
+
+        HistoryPanel.Visibility = LibraryActive ? Visibility.Collapsed : Visibility.Visible;
+        LibraryPanel.Visibility = LibraryActive ? Visibility.Visible : Visibility.Collapsed;
+        HintText.Text = LibraryActive ? Strings.LibraryHints : Strings.Hints;
+
+        ActiveView.Refresh();
+        if (ActiveList.Items.Count > 0) ActiveList.SelectedIndex = 0;
+        UpdateEmptyState();
+        SearchBox.Focus();
+    }
+
     private void UpdateEmptyState()
     {
-        EmptyHint.Visibility = List.Items.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
-        EmptyHint.Text = _store.Items.Count == 0 ? Strings.EmptyHistory : Strings.EmptySearch;
+        if (LibraryActive)
+        {
+            LibraryEmptyHint.Visibility = LibraryList.Items.Count == 0
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+            LibraryEmptyHint.Text = _library.Items.Count == 0
+                ? Strings.LibraryEmpty
+                : Strings.EmptySearch;
+        }
+        else
+        {
+            EmptyHint.Visibility = List.Items.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+            EmptyHint.Text = _store.Items.Count == 0 ? Strings.EmptyHistory : Strings.EmptySearch;
+        }
+
         SearchHint.Visibility = string.IsNullOrEmpty(SearchBox.Text)
             ? Visibility.Visible
             : Visibility.Collapsed;
+
+        var folder = FolderList.SelectedItem as LibraryFolder;
+        RenameFolderButton.IsEnabled = folder is { IsAll: false };
+        DeleteFolderButton.IsEnabled = folder is { IsAll: false };
     }
 
-    private void SearchBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+    private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
     {
-        _view.Refresh();
-        if (List.Items.Count > 0) List.SelectedIndex = 0;
+        ActiveView.Refresh();
+        if (ActiveList.Items.Count > 0) ActiveList.SelectedIndex = 0;
         UpdateEmptyState();
     }
+
+    private void FolderList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_libraryView is null) return;
+
+        _libraryView.Refresh();
+        if (LibraryList.Items.Count > 0) LibraryList.SelectedIndex = 0;
+        UpdateEmptyState();
+    }
+
+    // --------------------------------------------------------- клавиатура ---
 
     private void OnPreviewKeyDown(object sender, KeyEventArgs e)
     {
@@ -141,9 +220,14 @@ public partial class HistoryWindow : Window
                 e.Handled = true;
                 return;
 
+            case Key.Tab:
+                if (LibraryActive) HistoryTab.IsChecked = true;
+                else LibraryTab.IsChecked = true;
+                e.Handled = true;
+                return;
+
             case Key.Enter:
-                if (List.SelectedItem is ClipItem chosen)
-                    Use(chosen, paste: !ctrl);
+                UseSelected(paste: !ctrl);
                 e.Handled = true;
                 return;
 
@@ -168,19 +252,11 @@ public partial class HistoryWindow : Window
                 return;
 
             case Key.Delete when shift:
-                if (List.SelectedItem is ClipItem toDelete)
-                {
-                    var index = List.SelectedIndex;
-                    _store.Remove(toDelete);
-                    _view.Refresh();
-                    if (List.Items.Count > 0)
-                        List.SelectedIndex = Math.Min(index, List.Items.Count - 1);
-                    UpdateEmptyState();
-                }
+                DeleteSelected();
                 e.Handled = true;
                 return;
 
-            case Key.P when ctrl:
+            case Key.P when ctrl && !LibraryActive:
                 if (List.SelectedItem is ClipItem toPin)
                 {
                     _store.TogglePin(toPin);
@@ -190,60 +266,307 @@ public partial class HistoryWindow : Window
                 }
                 e.Handled = true;
                 return;
+
+            case Key.S when ctrl && !LibraryActive:
+                SaveSelectedToLibrary();
+                e.Handled = true;
+                return;
+
+            case Key.F2 when LibraryActive:
+                EditSelectedLibraryItem();
+                e.Handled = true;
+                return;
         }
 
         // Alt+1…9 — быстрый выбор
         if (alt && e.SystemKey >= Key.D1 && e.SystemKey <= Key.D9)
         {
             var index = e.SystemKey - Key.D1;
-            if (index < List.Items.Count && List.Items[index] is ClipItem quick)
-                Use(quick, paste: true);
+            if (index < ActiveList.Items.Count)
+            {
+                ActiveList.SelectedIndex = index;
+                UseSelected(paste: true);
+            }
             e.Handled = true;
         }
     }
 
     private void Move(int delta)
     {
-        if (List.Items.Count == 0) return;
-        var index = Math.Clamp(List.SelectedIndex + delta, 0, List.Items.Count - 1);
-        List.SelectedIndex = index;
-        List.ScrollIntoView(List.Items[index]);
+        var list = ActiveList;
+        if (list.Items.Count == 0) return;
+
+        var index = Math.Clamp(list.SelectedIndex + delta, 0, list.Items.Count - 1);
+        list.SelectedIndex = index;
+        list.ScrollIntoView(list.Items[index]);
     }
 
-    /// <summary>Скопировать запись в буфер и, если нужно, вставить в целевое окно.</summary>
-    private void Use(ClipItem item, bool paste)
+    // ----------------------------------------------------------- действия ---
+
+    private void UseSelected(bool paste)
     {
+        if (LibraryActive)
+        {
+            if (LibraryList.SelectedItem is LibraryItem item) Use(item.ToPayload(), item.FilesPresent, paste);
+        }
+        else
+        {
+            if (List.SelectedItem is ClipItem item) Use(item.ToPayload(), true, paste);
+        }
+    }
+
+    /// <summary>Скопировать в буфер и, если нужно, вставить в целевое окно.</summary>
+    private void Use(ClipboardPayload payload, bool available, bool paste)
+    {
+        if (!available)
+        {
+            ShowToast(Strings.ErrFileMissing);
+            return;
+        }
+
         HideWindow();
 
         // Собственную запись в буфер в историю не пишем.
         _monitor.SuppressNext();
 
-        if (!Paster.CopyToClipboard(item)) return;
+        if (!Paster.CopyToClipboard(payload)) return;
         if (paste && _settings.PasteOnSelect) Paster.PasteInto(_target);
     }
 
     /// <summary>Одиночный клик — просто скопировать запись, окно остаётся открытым.</summary>
+    private void CopyOnly(ClipboardPayload payload, bool available)
+    {
+        if (!available)
+        {
+            ShowToast(Strings.ErrFileMissing);
+            return;
+        }
+
+        _monitor.SuppressNext();
+        ShowToast(Paster.CopyToClipboard(payload) ? Strings.ToastCopied : Strings.ToastCopyFailed);
+    }
+
+    private void DeleteSelected()
+    {
+        if (LibraryActive)
+        {
+            if (LibraryList.SelectedItem is not LibraryItem item) return;
+
+            if (!Confirm(Strings.Format("ConfirmDeleteItem", item.Display))) return;
+
+            var index = LibraryList.SelectedIndex;
+            _library.Remove(item);
+            _libraryView.Refresh();
+            if (LibraryList.Items.Count > 0)
+                LibraryList.SelectedIndex = Math.Min(index, LibraryList.Items.Count - 1);
+        }
+        else
+        {
+            if (List.SelectedItem is not ClipItem item) return;
+
+            var index = List.SelectedIndex;
+            _store.Remove(item);
+            _view.Refresh();
+            if (List.Items.Count > 0)
+                List.SelectedIndex = Math.Min(index, List.Items.Count - 1);
+        }
+
+        UpdateEmptyState();
+    }
+
+    private void SaveSelectedToLibrary()
+    {
+        if (List.SelectedItem is not ClipItem item) return;
+
+        var errors = new List<string>();
+        var saved = _library.AddFromHistory(item, CurrentFolderId, errors);
+
+        ShowToast(saved is not null
+            ? Strings.ToastSavedToLibrary
+            : errors.FirstOrDefault() ?? Strings.ErrEmptyEntry);
+    }
+
+    private void EditSelectedLibraryItem()
+    {
+        if (LibraryList.SelectedItem is not LibraryItem item) return;
+
+        var dialog = new ItemEditorWindow(_library.Folders, item, CurrentFolderId) { Owner = this };
+        if (ShowModal(dialog) != true) return;
+
+        item.Title = dialog.EntryTitle;
+        if (item.Kind == ClipKind.Text) item.Text = dialog.EntryText;
+        item.FolderId = dialog.FolderId;
+        item.Refresh();
+
+        _library.Save();
+        _libraryView.Refresh();
+        UpdateEmptyState();
+    }
+
+    // ------------------------------------------------------------ мышь ---
+
     private void List_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        if (e.OriginalSource is not DependencyObject source) return;
-        if (ItemsControl.ContainerFromElement(List, source) is not ListBoxItem container) return;
-        if (container.DataContext is not ClipItem item) return;
+        if (ItemUnder(List, e) is not ClipItem item) return;
 
         List.SelectedItem = item;
-        CopyOnly(item);
+        CopyOnly(item.ToPayload(), available: true);
     }
 
     private void List_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
-        if (List.SelectedItem is ClipItem item) Use(item, paste: true);
+        if (List.SelectedItem is ClipItem item) Use(item.ToPayload(), true, paste: true);
     }
 
-    /// <summary>Скопировать в буфер без вставки и показать подтверждение.</summary>
-    private void CopyOnly(ClipItem item)
+    private void LibraryList_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        _monitor.SuppressNext();
+        if (ItemUnder(LibraryList, e) is not LibraryItem item) return;
 
-        ShowToast(Paster.CopyToClipboard(item) ? Strings.ToastCopied : Strings.ToastCopyFailed);
+        LibraryList.SelectedItem = item;
+        CopyOnly(item.ToPayload(), item.FilesPresent);
+    }
+
+    private void LibraryList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (LibraryList.SelectedItem is LibraryItem item)
+            Use(item.ToPayload(), item.FilesPresent, paste: true);
+    }
+
+    private static object? ItemUnder(ListBox list, MouseButtonEventArgs e)
+    {
+        if (e.OriginalSource is not DependencyObject source) return null;
+        return ItemsControl.ContainerFromElement(list, source) is ListBoxItem container
+            ? container.DataContext
+            : null;
+    }
+
+    // ------------------------------------------------------- библиотека ---
+
+    private void AddText_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new ItemEditorWindow(_library.Folders, null, CurrentFolderId) { Owner = this };
+        if (ShowModal(dialog) != true) return;
+
+        var added = _library.AddText(dialog.EntryText, dialog.EntryTitle, dialog.FolderId);
+        SelectInLibrary(added);
+    }
+
+    private void AddFile_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = Strings.PickFilesTitle,
+            Multiselect = true,
+            CheckFileExists = true
+        };
+
+        _modalOpen = true;
+        var picked = dialog.ShowDialog(this) == true;
+        _modalOpen = false;
+
+        if (picked) AddFilesToLibrary(dialog.FileNames);
+    }
+
+    private void AddFilesToLibrary(IEnumerable<string> paths)
+    {
+        var errors = new List<string>();
+        var added = _library.AddFiles(paths, CurrentFolderId, errors);
+
+        if (added is not null)
+        {
+            LibraryTab.IsChecked = true;
+            SelectInLibrary(added);
+            ShowToast(errors.Count == 0 ? Strings.ToastSavedToLibrary : errors[0]);
+        }
+        else
+        {
+            ShowToast(errors.FirstOrDefault() ?? Strings.ErrEmptyEntry);
+        }
+    }
+
+    private void SelectInLibrary(LibraryItem item)
+    {
+        _libraryView.Refresh();
+        LibraryList.SelectedItem = item;
+        LibraryList.ScrollIntoView(item);
+        UpdateEmptyState();
+    }
+
+    private void AddFolder_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new PromptWindow(Strings.ButtonAddFolder, Strings.LabelFolder, Strings.FolderNew)
+        {
+            Owner = this
+        };
+        if (ShowModal(dialog) != true) return;
+
+        var folder = _library.AddFolder(dialog.Value);
+        FolderList.SelectedItem = folder;
+    }
+
+    private void RenameFolder_Click(object sender, RoutedEventArgs e)
+    {
+        if (FolderList.SelectedItem is not LibraryFolder folder || folder.IsAll) return;
+
+        var dialog = new PromptWindow(Strings.TooltipRenameFolder, Strings.LabelFolder, folder.Name)
+        {
+            Owner = this
+        };
+        if (ShowModal(dialog) != true) return;
+
+        _library.RenameFolder(folder, dialog.Value);
+    }
+
+    private void DeleteFolder_Click(object sender, RoutedEventArgs e)
+    {
+        if (FolderList.SelectedItem is not LibraryFolder folder || folder.IsAll) return;
+        if (!Confirm(Strings.Format("ConfirmDeleteFolder", folder.Name))) return;
+
+        _library.RemoveFolder(folder);
+        FolderList.SelectedIndex = 0;
+    }
+
+    // ----------------------------------------------- перетаскивание файлов ---
+
+    private void Window_DragOver(object sender, DragEventArgs e)
+    {
+        var files = e.Data.GetDataPresent(DataFormats.FileDrop);
+        e.Effects = files ? DragDropEffects.Copy : DragDropEffects.None;
+        DropOverlay.Visibility = files ? Visibility.Visible : Visibility.Collapsed;
+        e.Handled = true;
+    }
+
+    private void Window_DragLeave(object sender, DragEventArgs e) =>
+        DropOverlay.Visibility = Visibility.Collapsed;
+
+    private void Window_Drop(object sender, DragEventArgs e)
+    {
+        DropOverlay.Visibility = Visibility.Collapsed;
+
+        if (e.Data.GetData(DataFormats.FileDrop) is string[] files && files.Length > 0)
+            AddFilesToLibrary(files.Where(f => File.Exists(f)));
+
+        e.Handled = true;
+    }
+
+    // ------------------------------------------------------------ прочее ---
+
+    private bool Confirm(string question)
+    {
+        _modalOpen = true;
+        var result = MessageBox.Show(this, question, "WiClip",
+            MessageBoxButton.YesNo, MessageBoxImage.Question);
+        _modalOpen = false;
+        return result == MessageBoxResult.Yes;
+    }
+
+    private bool? ShowModal(Window dialog)
+    {
+        _modalOpen = true;
+        var result = dialog.ShowDialog();
+        _modalOpen = false;
+        Activate();
+        return result;
     }
 
     private void ShowToast(string text)
